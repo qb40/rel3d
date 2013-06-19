@@ -1,0 +1,652 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--.............................................-->
+<!--. Downloaded from Phat Code                 .-->
+<!--. http://www.phatcode.net/                  .-->
+<!--.............................................-->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="description" content="Rel explains 3D rotations">
+<meta name="keywords" content="Rel explains 3D rotations">
+<title>phatcode.net / 3D Series Chapter 2: Rotations by Rel (Richard Eric M. Lope)</title>
+<style type="text/css">
+<!--
+body {font-family:verdana, geneva, helvetica, arial, sans-serif; font-size:x-small; color:#000000; background:#ffffff;}
+p, table, td {font-size:x-small; line-height:150%;}
+li {line-height:150%; margin-bottom:1em;}
+h1 {font-size:large;}
+h2 {font-size:medium;}
+h3 {font-size:small;}
+a:link {color:#0000ff;}
+a:visited {color:#0000ff;}
+a:active {color:#0000ff;}
+a:hover {color:#0000aa;}
+.code {font-family:courier new, courier; font-size:x-small; line-height:130%; color:#000000; background-color:#dddddd; padding:10px; margin:15px; border:#000000 solid 2px;}
+.border {border: #000000 solid 1px;}
+.divide {border: #000000 solid 1px; margin-top:10px; margin-bottom:10px;}
+-->
+</style>
+</head>
+<body>
+<h1 align="center">3D Series Chapter 2: Rotations</h1>
+<h3 align="center">by <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">Rel</a> (Richard Eric M. Lope)</h3>
+<div class="divide"></div>
+<h2>Rotations, the how and why's...</h2>
+
+<h2>I. Introduction</h2>
+
+<p>I bet you felt very annoyed by the fact that I only explained projection on my first article right? Well, the series
+is primarily geared to coders who had no experience in 3d coding and to advance one's knowledge regarding 3d in general.</p>
+
+<p>This time around, I will be explaining to you 2d and 3d rotations. "2D rotation in a 3d article?!!! Are you out of your
+mind?!!!" Hardly, in fact, 2d rotation is the basis of 3d rotation as you will know later. But before I could discuss
+rotations to you, let me start by some basic intermediate and trigonometric math.  Don't worry, this is not as hard as
+you might think. So prepare yourself for some street math. ;*)</p>
+
+<h2>II. The polar coordinate system</h2>
+
+<p>Up to this point, we have used the Cartesian coordinate system in 2d or in 3d. Coordinates in these systems are
+defined as either p(x,y) or p(x,y,z).</p>
+
+<p>In the polar coodinate system however, the ordered pair is not represented by x or y but of r and angle originating
+from the origin or the pole, which is the center of the coordinate system. Given an angle Theta and a radius r the
+ordered pair would be written as: p(r,theta).</p>
+
+<p>r represents the distance from pole, and theta is the measure of the angle from the positive x-axis.</p>
+
+<p align="center"><img src="polar.png"></p>
+
+<p>So in the polar system, we only need the length (r), sometimes called the magnitude, and the angle from the positive
+x-axis. Why discuss polar system when the monitor is best suited for a Cartesian system? The answer is that some things
+can be easily done in the polar coodinate system. And one of those things is "rotation" ;*)</p>
+
+<h2>III. The basic trigonometric functions and their relationship to the Polar and Cartesian systems...</h2>
+
+<p>There are six basic trig functions. The sine, cosine, tangent, secant, cosecant, and the cotangent. As of the moment,
+we are interested in just 2, the <b>SINE</b> and <b>COSINE</b>.</p>
+
+<p align="center"><img src="unitcircle.png"></p>
+
+<p>Say you have the unit circle above (a unit circle is a circle having a radius of 1), with an angle (theta) at 45
+degrees. I already drew the right triangle for you labelled as Y or O (Opposite side), X or A (adjacent side) and r or
+H (Hypotenuse). In Trigonometry, there is a mnemonic called the "SOH-CAH-TOA" which roughly means:</p>
+
+<div class="code">
+SOH = Sin(Theta) = Opposite/Hypotenuse<br />
+CAH = Cos(Theta) = Adjacent/Hypotenuse<br />
+TOA = Tan(Theta) = Take a wild guess. :p<br />
+</div>
+
+<p>Translating it to x,y and r...</p>
+
+<div class="code">
+sin(theta) = y/r<br />
+cos(theta) = x/r<br />
+</div>
+
+<p>As i said we only need sin and cos for now.</p>
+
+<p>Multiplying both sides by r...</p>
+
+<div class="code">
+&nbsp; &nbsp; r(Sin(Theta) = y/r)r<br />
+&nbsp; &nbsp; r(Cos(Theta) = x/r)r<br />
+=<br />
+&nbsp; &nbsp; r*(Sin(Theta) = y<br />
+&nbsp; &nbsp; r*(Cos(Theta) = x<br />
+=<br />
+EQ. 1<br />
+&nbsp; &nbsp; x = r * cos(Theta)<br />
+EQ. 1-1<br />
+&nbsp; &nbsp; y = r * sin(Theta)<br />
+</div>
+
+<p>Since on a unit circle r = 1 then</p>
+
+<div class="code">
+x = 1 * cos(Theta)<br />
+y = 1 * sin(Theta)<br />
+or <br />
+EQ. 2<br />
+&nbsp; &nbsp; x = cos(Theta)<br />
+EQ. 2-1<br />
+&nbsp; &nbsp; y = sin(Theta)<br />
+</div>
+
+<p>By now you should already have realized that Sine has something to do with the y coordinate and Cosine to the x
+coord. ;*)</p>
+
+<p>Now how do we convert from polar to Cartesian? Easy, as long as you know the radius and the angle (theta) just pluck
+the values to EQ's 1 and 1-1. ie:</p>
+
+<div class="code">
+x = r * cos(Theta)<br />
+y = r * sin(Theta)<br />
+Pset(x,y)<br />
+</div>
+
+<p>Here's an example file: <a href="polrot.bas" target="_blank">polrot.bas</a></p>
+
+<p>To change from polar to Cartesian:</p>
+
+<div class="code">
+&nbsp; &nbsp; r = Sqr(x^2 + y^2)<br />
+Theta = ATN(y/x); x&lt;&gt;0&nbsp; &nbsp; <br />
+</div>
+
+<p><i>*These 2 would be useful later on but keep it on the sidelines for now. ;*)</i></p>
+
+<p>Before forget, all the other trig functions can be derived from the SIN and COS function.</p>
+
+<div class="code">
+Tan(a) = Sin(a)/Cos(a)<br />
+Sec(a) = 1/Cos(a)<br />
+Csc(a) = 1/Sin(a)<br />
+Cot(a) = 1/Tan(a) = Cos(a)/Sin(a)<br />
+</div>
+
+<h2>IV. Degrees and Radians</h2>
+
+<p>Okay, this is very important so listen closely. We, as students are used with the degree measurement of angles.
+Probably because  degrees are easy to visualize, so our teachers and beginners math books use it. But it turns out
+that computer languages, BASIC included, cannot directly accept degree measure in their built in trig functions.
+Why? Frankly, I don't know. Maybe because radians is an exact measure or the implementors just want to be cooler. :*)</p>
+
+<p>Now, since QB won't let you pass degrees to their built-in trig functions, and radians is sometimes a pain to
+implement (due to the fact that it's a small value), we have to use degree measurement and converting it to radian
+measure before passing it to the functions.</p>
+
+<p>To convert:</p>
+
+<div class="code">
+1. Degrees to Radians<br />
+&nbsp; &nbsp; &nbsp; &nbsp;Radians = Degrees*PI/180<br />
+2. Radians to Degrees<br />
+&nbsp; &nbsp; &nbsp; &nbsp;Degrees = Radians*180/PI<br />
+</div>
+
+<p><i>*PI is a value of the circumference of a circle divided by its diameter. Its actual value is 3.141593...</i></p>
+
+<p><b>Fun fact:</b> Pi is 180 degrees. Guess what 2*PI is? :*)<br />
+<b>Fun fact:</b> You can easily calculate PI by PI=ATN(1)*4<br />
+
+<h2>V. 2d Rotation</h2>
+
+<p>Using the polar system to rotate a point around the center is pretty easy. But how about rotation from the point's
+coordinate itself? This is where our 2d coordinate rotation comes from. Rotating from p(x,y) to p(x',y'):</p>
+
+<p align="center"><img src="rotangle.png"></p>
+
+<div class="code">
+&nbsp; &nbsp; x' = x*cos(Theta) - y*sin(Theta)<br />
+&nbsp; &nbsp; y' = y*cos(Theta) + x*sin(Theta)<br />
+Where:<br />
+&nbsp; &nbsp; x&nbsp; = original x coord<br />
+&nbsp; &nbsp; y&nbsp; = original y coord<br />
+&nbsp; &nbsp; x' = rotated x coord<br />
+&nbsp; &nbsp; y' = rotated y coord<br />
+</div>
+
+<p>But how did those equations came about? Most articles just smack you into these equations and never look back on how
+those came to be. I bet some of them doesn't know how to derive it themselves. :*). And because I'm different, I will
+teach you how they came to be. Moreso, you could impress your friends by your geekiness when you tell them you know. :*)</p>
+
+<h2>V-a. Proof on how the 2d rotation is derived.</h2>
+
+<p>Remember these equations?</p>
+
+<div class="code">
+EQ. 1<br />
+&nbsp; &nbsp; x = r * cos(Theta)<br />
+EQ. 1-1<br />
+&nbsp; &nbsp; y = r * sin(Theta)<br />
+</div>
+
+<p>Yep they are the Polar to Cartesian coordinate system conversion. :*) We also need the <i>Angle addition identities.</i></p>
+
+<p align="center"><img src="addangle.png"></p>
+
+<p>Legend:<br />
+P = Phi<br />
+T = Theta</p>
+
+<p>Cosine Identity:</p>
+
+<div class="code">
+EQ. 3<br />
+&nbsp; &nbsp; &nbsp;Cos(P+T)= Cos(P)*Cos(T)-Sin(P)*Sin(T)<br />
+</div>
+
+<p>Sine Identity:</p>
+
+<div class="code">
+EQ. 3-1<br />
+&nbsp; &nbsp; Sin(P+T)= Sin(P)*Cos(T)+Cos(P)*Sin(T)<br />
+</div>
+
+<p>Let (P+T) = Theta(Just one angle)...</p>
+
+<div class="code">
+EQ. 1 becomes:<br />
+&nbsp; &nbsp; x = r * cos(P+T)<br />
+EQ. 1-1<br />
+&nbsp; &nbsp; y = r * sin(P+T)<br />
+</div>
+
+<p>Then by substitution from EQ 1 and 1-1</p>
+
+<div class="code">
+EQ. 1 becomes:<br />
+&nbsp; &nbsp; x' = r * (Cos(P)*Cos(T)-Sin(P)*Sin(T))<br />
+EQ. 1-1 becomes:<br />
+&nbsp; &nbsp; y' = r * (Sin(P)*Cos(T)+Cos(P)*Sin(T))<br />
+</div>
+
+<p>Distributing r:</p>
+
+<div class="code">
+x' = r*Cos(P)*Cos(T) - r*Sin(P)*Sin(T)<br />
+y' = r*Sin(P)*Cos(T) + r*Cos(P)*Sin(T)<br />
+</div>
+
+<p>And looking back at EQ's 1 and 1-1:</p>
+
+<div class="code">
+Let P = Theta...<br />
+&nbsp; &nbsp;x = r * cos(P)<br />
+&nbsp; &nbsp;y = r * sin(P)<br />
+</div>
+
+<p>Then by substitution:</p>
+
+<div class="code">
+x' = x * Cos(T) - y * Sin(T)<br />
+y' = y * Cos(T) + x * Sin(T)<br />
+</div>
+
+<p>And Viola!!! That's how you prove the 2d rotation formula. ;*)</p>
+
+<p><b>Final equations:</b></p>
+
+<div class="code">
+Newx = oldx*Cos(Theta) - oldy*Sin(Theta)<br />
+Newy = oldy*Cos(Theta) + oldx*Sin(Theta)<br />
+</div>
+
+<p>*Note: Actually, had I used EQ's 2 and 2-1, the proof would be much easier since r is already removed. Though I
+believe that using r forces you to understand the concept behind the proof. So as an exercise, why don't you try it
+yourself? ;*)</p>
+
+<p>If you have understood all the stuff that I have written form article 1 up to here, you might have already guessed
+that our standard 2d rotation is THE SAME AS ROTATING FROM THE Z-AXIS. If you did, good. If not, look again on this
+figure:</p>
+
+<p align="center"><img src="rightsys.png"></p>
+
+<p>See, rotating from the z-axis rotates your point on the XY plane. Here's the code supplement which added rotations
+to our previous starfield. Don't get dizzy. :*)<br />
+<a href="proj-rot.bas" target="_blank">proj-rot.bas</a></p>
+
+<h2>VI. Let's go 3d!!!!</h2>
+
+<p>Remember when I said that 3d rotation is almost like 2d rotation? Well, I'm not a man who breaks my word. So let me
+begin by saying that since rotation on the z-axis takes on the xy plane and rotation on the x-axis takes on the yz
+plane, where do you think rotation on the y axis take place? Yes, the xz plane!. :*)</p>
+
+<p>Now doing these rotations are pretty straightforward, all we have to do is smack the needed values on our 2d
+rotation equation for each axis and  we're good to go. One thing to remember though is <i>"TO USE THE OLD VALUES UNTIL
+THE NEW ONES ARE FOUND"</i>. Which means for a full rotation on all the axes, do not directly put values until they are
+fully rotated on the axis that they are rotated.</p>
+
+<p>Here's the full 3d rotation Equations:<br />
+<i>*All values are floating point numbers</i></p>
+
+<div class="code">
+'***Rotation on the Z-axis<br />
+NewY = y*cos(Thetax) - z*sin(Thetax)<br />
+NewZ = z*cos(Thetax) + y*sin(Thetax)<br />
+y = NewY<br />
+z = NewZ<br />
+<br />
+'***Rotation on the Y-axis<br />
+NewZ = z*cos(Thetay) - x*sin(Thetay)<br />
+NewX = x*cos(Thetay) + z*sin(Thetay)<br />
+x = NewX<br />
+<br />
+'***Rotation on the Z-axis<br />
+NewX = x*cos(Thetaz) - y*sin(Thetaz)<br />
+NewY = y*cos(Thetaz) + x*sin(Thetaz)<br />
+<br />
+Rotatedx = NewX<br />
+Rotatedy = NewY<br />
+Rotatedz = NewZ<br />
+</div>
+
+<p>Your rotated x/y/z are the points completely rotated over the x,y and z axes. I had to save the rotated values at
+some point to make it work or our rotations wouldn't look right. :*). Its also notable that <i>"THE ORDER IN WHICH YOU
+ROTATE FROM EACH AXIS IS VERY IMPORTANT"</i>. Rotating in z-x-y order would not produce the same result as rotating in
+the x-y-z order.  I'm using x-y-z because of the alphabet.  Actually, Kiwidog's rotation is in x-y-z order and since
+his article started me with 3d, I'm writing this as a tribute to him. As they say, "old habits die hard".:*)</p>
+
+<p>Since, QB's implementation of the FPU(The Floating Point Unit) is really crap, we could optimize this by using
+lookup tables or just calculating some constants before the actual rotation equations. ie.</p>
+
+<div class="code">
+cx! = COS(AngleX!)<br />
+sx! = SIN(AngleX!)<br />
+cy! = COS(AngleY!)<br />
+sy! = SIN(AngleY!)<br />
+cz! = COS(AngleZ!)<br />
+sz! = SIN(AngleZ!)<br />
+<br />
+FOR i = 0 TO Maxpoints<br />
+&nbsp; &nbsp; x! = model(i).x<br />
+&nbsp; &nbsp; y! = model(i).y<br />
+&nbsp; &nbsp; z! = model(i).z<br />
+<br />
+&nbsp; &nbsp; NewY! = (y! * cx!) - (z! * sx!)<br />
+&nbsp; &nbsp; NewZ! = (z! * cx!) + (y! * sx!)<br />
+&nbsp; &nbsp; y! = NewY!<br />
+&nbsp; &nbsp; z! = NewZ!<br />
+&nbsp; &nbsp; NewZ! = (z! * cy!) - (x! * sy!)<br />
+&nbsp; &nbsp; NewX! = (x! * cy!) + (z! * sy!)<br />
+&nbsp; &nbsp; x! = NewX!<br />
+&nbsp; &nbsp; NewX! = (x! * cz!) - (y! * sz!)<br />
+&nbsp; &nbsp; NewY! = (y! * cz!) + (x! * sz!)<br />
+Next i<br />
+</div>
+
+<p>Doing this would speed your render a lot. :*) Here's an example file: <a href="3drot.bas" target="_blank">3drot.bas</a></p>
+
+<p>Before I forget, to translate, subtract cam(x,y,z) AFTER rotation. Unless, you'd want your rotations to be off-center.
+Think about when to use either. Heck, why don't you try it to see the effects? :*)</p>
+
+<p>However, there's still a faster way to rotate. Notice the amount of multiplication just to do a full 3 axis rotation?
+Yep, 12 multiplies! It turns out that we can reduce this to just 9! But how do we do it?  Either by using matrices or
+weeding out constants using standard algebra. Both methods would work well and would roughly produce the same result.
+Same nine multiplies, same amount of arithmetic. Though you could directly translate the points using the 4th row of a
+4*4 matrix, we can also do it by subtracting our camera value from the rotated coordinate. And if you look closely either
+the matrix or the algebra method would produce the same constants. :*) *I will touch up on matrices after the
+texturemapping article so don't worry. :*)</p>
+
+<h2>VII.  From 12 to 9</h2>
+
+<p>There are other articles discussing this type of optimizations but sadly, the final 3*3 matrix just does not rotate
+right. So if you want to derive a final 3*3 matrix yourself from your own rotation order, you have to do it yourself. :*)</p>
+
+<p>BTW, the constants we will derive after this is a 3*3 rotation matrix. We just didn't use the matrix way but the
+algebra 101 way. :*)</p>
+
+<p>So now let's begin the headache.</p>
+
+<p><b>Standard 12 mul rotation:</b></p>
+
+<p>Let ox,oy,oz the old coords</p>
+
+<p>Let nx,ny,nz the new rotated coords</p>
+
+<div class="code">
+cx = cos(anglex)<br />
+cy = cos(angley)<br />
+cz = cos(anglez)<br />
+<br />
+sx = sin(anglex)<br />
+sy = sin(angley)<br />
+sz = sin(anglez)<br />
+</div>
+
+<p>I'm numbering the equations for easy referencing later so you won't get lost in the mess.</p>
+
+<div class="code">
+******<br />
+1. ny = oy*cx - oz*sx	'x axis<br />
+2. nz = oz*cx + oy*sx<br />
+<br />
+&nbsp; &nbsp;oy = ny<br />
+&nbsp; &nbsp;oz = nz<br />
+<br />
+3. nz = oz*cy - ox*sy	'x axis<br />
+4. nx = ox*cy + oz*sy<br />
+<br />
+&nbsp; &nbsp;oy = ny<br />
+&nbsp; &nbsp;oz = nz<br />
+<br />
+5. nx = ox*cz - oy*sz	'z axis<br />
+6. ny = oy*cz + ox*sz<br />
+<br />
+'''All points rotated ;*)<br />
+*****<br />
+</div>
+
+<p><i>*From 12 to 9 multiplies. We will simplify each axis equation starting from the x axis. Not the numbers as
+they reference equations from our original 12 mul rotation.</i></p>
+
+<p>So...</p>
+
+<div class="code">
+Oz(2) = Nz(2)<br />
+&nbsp; &nbsp; &nbsp; = nz = oz*cx + oy*sx<br />
+</div>
+
+<p><i>* I don't know if this would make sense to you but this I'm trying to minimize the text for the actual math to be
+understandable. ;*)</i></p>
+
+<p>****For X axis....</p>
+
+<div class="code">
+nx(4) = ox*cy+oz*sy&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'orig<br />
+nx(4) = ox*cy+oz(2)*sy<br />
+</div>
+
+<p>*let's substitute nz(2) to oz</p>
+
+<div class="code">
+nx(4) = ox*cy+[oz*cx+oy*sx]*sy<br />
+</div>
+
+<p>*distribute sy inside nz(2)</p>
+
+<div class="code">
+nx(4) = ox*cy+oz*cx*sy+oy*sx*sy<br />
+nx(5) =	ox*cz-oy*sz 'orig<br />
+</div>
+
+<p>*now substitute nx(4) and ny(1)</p>
+
+<div class="code">
+nx(5) = [ox*cy+oz*cx*sy+oy*sx*sy]*cz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -[oy*cx-oz*sx]*sz<br />
+</div>
+
+<p>*distribute cz and sz</p>
+
+<div class="code">
+nx(5) = ox*cy*cz+oz*cx*sy*cz+oy*sx*sy*cz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -[oy*cx*sz-oz*sx*sz]<br />
+</div>
+
+<p>*distribute the negative sign(-) and remove parenthesis. <b>(note the change of signs)</b></p>
+
+<div class="code">
+nx(5) = ox*cy*cz+oz*cx*sy*cz+oy*sx*sy*cz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -oy*cx*sz+oz*sx*sz<br />
+</div>
+
+<p>*use the commutative property of addition to reorder the terms in x+y+z order.</p>
+
+<div class="code">
+nx(5) =&nbsp; &nbsp;ox*cy*cz&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'X<br />
+&nbsp; &nbsp; &nbsp; &nbsp; + oy*sx*sy*cz - oy*cx*sz&nbsp; 'y<br />
+&nbsp; &nbsp; &nbsp; &nbsp; + oz*cx*sy*cz + oz*sx*sz&nbsp; 'Z<br />
+</div>
+
+<p>*factor out x,y and z</p>
+
+<div class="code">
+nx(5) =&nbsp; &nbsp;ox*[cy*cz]&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'X<br />
+&nbsp; &nbsp; &nbsp; &nbsp; + oy*[sx*sy*cz - cx*sz]&nbsp; 'y<br />
+&nbsp; &nbsp; &nbsp; &nbsp; + oz*[cx*sy*cz + sx*sz]&nbsp; 'Z<br />
+</div>
+
+<p>*We already have precalculated the constants to use(inside square brackets). Let's store 'em.</p>
+
+<p>so...</p>
+
+<div class="code">
+xx = cy*cz<br />
+xy = sx*sy*cz - cx*sz<br />
+xz = cx*sy*cz + sx*sz<br />
+</div>
+
+<p>****For Y axis...</p>
+
+<div class="code">
+ny(6) = oy(1)*cz + ox(4)*sz<br />
+ny(6) = [oy*cx - oz*sx]*cz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +{ox*cy+[oz*cx+oy*sx]*sy}*sz<br />
+</div>
+
+<p>*distribute cz and sy</p>
+
+<div class="code">
+ny(6) = oy*cx*cz - oz*sx*cz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +[ox*cy+oz*cx*sy+oy*sx*sy]*sz<br />
+ny(6) = oy*cx*cz - oz*sx*sy*cz	&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; +ox*cy*sz + oz*cx*sy*sz + oy*sx*sy*sz<br />
+</div>
+
+<p>*Rearrange in x,y,z order</p>
+
+<div class="code">
+ny(6) = ox*cy*sz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oy*cx*cz + oy*sx*sy*sz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -oz*sx*cz + oz*cx*sy*sz<br />
+</div>
+
+<p>*Factor out x, y and z</p>
+
+<div class="code">
+ny(6) = ox*cy*sz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oy*cx*cz + oy*sx*sy*sz<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -oz*sx*cz + oz*cx*sy*sz<br />
+ny(6) = ox*[cy*sz]<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oy*[cx*cz + sx*sy*sz]<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -oz*[sx*cz + cx*sy*sz]<br />
+</div>
+
+<p>*oz has a (-) sign. Make sx*cz negative so that we could use	addition.</p>
+
+<div class="code">
+ny(6) = ox*[cy*sz]<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oy*[cx*cz + sx*sy*sz]<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oz*[-sx*cz + cx*sy*sz]<br />
+'store...<br />
+&nbsp; &nbsp; yx = cy*sz<br />
+&nbsp; &nbsp; yy = cx*cz + sx*sy*sz<br />
+&nbsp; &nbsp; yz = -sx*cz + cx*sy*sz<br />
+</div>
+
+<p>****For Z axis...(easiest!!!!)</p>
+
+<div class="code">
+nz(3) = oz(2)*cy - ox*sy<br />
+</div>
+
+<p>*substitute nz(2)</p>
+
+<div class="code">
+nz(3) = [oz*cx + oy*sx]*cy - ox*sy<br />
+</div>
+
+<p>*distribute</p>
+
+<div class="code">
+nz(3) = oz*cx*cy + oy*sx*cy - ox*sy<br />
+nz(3) = - ox*sy<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oy*sx*cy<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oz*cx*cy<br />
+</div>
+
+<p>*make sy negtive as to make ox positive</p>
+
+<div class="code">
+nz(3) = ox*[-sy]<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oy*[sx*cy]<br />
+&nbsp; &nbsp; &nbsp; &nbsp; +oz*[cx*cy]<br />
+&nbsp; &nbsp;zx = -sy<br />
+&nbsp; &nbsp;zy = sx*cy<br />
+&nbsp; &nbsp;zz = cx*cy<br />
+</div>
+
+<p>****Final Precalculated constants!!!!<br />
+****This is our final 3*3 Matrix.</p>
+
+<div class="code">
+'X axis<br />
+xx = cy*cz<br />
+xy = sx*sy*cz - cx*sz<br />
+xz = cx*sy*cz + sx*sz<br />
+<br />
+'Y axis<br />
+yx = cy*sz<br />
+yy = cx*cz + sx*sy*sz<br />
+yz = -sx*cz + cx*sy*sz<br />
+<br />
+'Z axis<br />
+zx = -sy<br />
+zy = sx*cy<br />
+zz = cx*cy<br />
+</div>
+
+<p>We smack the above constants down our original coord and we get the rotated coord without much hassle. Faster and
+simpler too!!!</p>
+
+<p>Final Equations!!!! (9 muls only)</p>
+
+<div class="code">
+nx = ox*xx + oy*xy + oz*xz<br />
+ny = ox*yx + oy*yy + oz*yz<br />
+nz = ox*zx + oy*zy + oz*zz<br />
+</div>
+
+<p>Speed increase may not be apparent if you're just rotating a cube but try to rotate a 1000 polygon model and
+you'll see how much speed difference there is. ;*)</p>
+
+<p>Here's a sample file benchmarking this against the standard 12 mul rotation: <a href="3dbench.bas" target="_blank">3dbench.bas</a><br />
+<i>Editor's Note: Start QB with the /AH switch to avoid the "subscript out of range" error.</i></p>
+
+<p>You might want to see what's in store for you on the next article. So here is just one (two actually) little part
+of it. :*)<br />
+<a href="3dwire.bas" target="_blank">3dwire.bas</a><br />
+<a href="texture.bas" target="_blank">texture.bas</a></p>
+
+<p>Lastly, don't limit yourself to just points, you can use sprites for better and cooler effects. :*)<br />
+<a href="vecballs.bas" target="_blank">vecballs.bas</a>
+</p>
+
+<p>Get yourself a stretchsprite routine and you cam make some even cooler stuff!!!<br />
+<a href="stretch.bas" target="_blank">stretch.bas</a></p>
+
+<p>From now on I'll be using the 3*3 matrix constants as opposed to the 12 mul rotation so that our renders are a lot
+faster. And also because it will not only be points that we will rotate later but VECTORS. :*)</p>
+
+<p>Now go ahead and code yourself a 3d rotator even if its just a cube. Because next time I'll be discussing to you on
+how to generate 3d shapes the math way and I'll touch up on polygons so that you can fill your models at runtime and
+impress your friends. I'll also touch up on 2 more 3d coordinate systems. The SPHERICAL and CYLINDRICAL coordinate
+systems. :*). So until next 'ish, Happy Coding!!!</p>
+
+<p>Credits:</p>
+
+<p>Kiwidog for introducing me to the world of 3d<br />
+Plasma357 for SetVideoSeg<br />
+Scm for proofreading<br />
+Biskbart for the tesselation algo<br />
+
+<p><b>Relsoft 2004</b></p><div class="divide"></div>
+<table>
+<tr><td align="right"><b>Author:</b></td><td>Rel (Richard Eric M. Lope)</td></tr>
+<tr><td align="right"><b>Email:</b></td><td><a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;</a></a></td></tr>
+<tr><td align="right"><b>Website:</b></td><td><a href="http://rel.betterwebber.com/" target="_blank">http://rel.betterwebber.com/</a></td></tr>
+<tr><td align="right"><b>Released:</b></td><td>2004</td></tr>
+</table>
+</body>
+</html>

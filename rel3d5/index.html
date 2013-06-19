@@ -1,0 +1,455 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--.............................................-->
+<!--. Downloaded from Phat Code                 .-->
+<!--. http://www.phatcode.net/                  .-->
+<!--.............................................-->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="description" content="Describes the fast alternative 3D "LookAt" transform">
+<meta name="keywords" content="Describes the fast alternative 3D "LookAt" transform">
+<title>phatcode.net / 3D Series Chapter 5: Lookat by Rel (Richard Eric M. Lope)</title>
+<style type="text/css">
+<!--
+body {font-family:verdana, geneva, helvetica, arial, sans-serif; font-size:x-small; color:#000000; background:#ffffff;}
+p, table, td {font-size:x-small; line-height:150%;}
+li {line-height:150%; margin-bottom:1em;}
+h1 {font-size:large;}
+h2 {font-size:medium;}
+h3 {font-size:small;}
+a:link {color:#0000ff;}
+a:visited {color:#0000ff;}
+a:active {color:#0000ff;}
+a:hover {color:#0000aa;}
+.code {font-family:courier new, courier; font-size:x-small; line-height:130%; color:#000000; background-color:#dddddd; padding:10px; margin:15px; border:#000000 solid 2px;}
+.border {border: #000000 solid 1px;}
+.divide {border: #000000 solid 1px; margin-top:10px; margin-bottom:10px;}
+-->
+</style>
+</head>
+<body>
+<h1 align="center">3D Series Chapter 5: Lookat</h1>
+<h3 align="center">by <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">Rel</a> (Richard Eric M. Lope)</h3>
+<div class="divide"></div>
+<h2>I. Introduction</h2>
+
+<p>One of the hardest part in making an article is actually starting one. Here I am staring at the monitor for 15
+minutes doing nothing but listening to smashing pumpkins. Greatest band (the coolest!!) ever. I can't say the same
+for zwan though, as they sound so gay. C'mon Corgan!!! Return to your roots!!!</p>
+
+<p>Okay, enough out of topic babble. This time, I'm going to discuss about 3d viewing systems. I would like to reiterate
+that you should have read my previous articles in 3d before reading this primer as this builds around those previous
+chapters. If not, here are the links:</p>
+
+<ul>
+<li style="margin-bottom:0em;"><a href="http://www.phatcode.net/articles.php?id=212" target="_blank">Chapter 1: Entering The 3D Dimension</a></li>
+<li style="margin-bottom:0em;"><a href="http://www.phatcode.net/articles.php?id=213" target="_blank">Chapter 2: Rotation -- The How's and Why's</a></li>
+<li style="margin-bottom:0em;"><a href="http://www.phatcode.net/articles.php?id=214" target="_blank">Chapter 3: Vectors Are Cool!</a></li>
+<li style="margin-bottom:0em;"><a href="http://www.phatcode.net/articles.php?id=215" target="_blank">Chapter 4: Matrices Are Your Friends</a></li>
+<li style="margin-bottom:0em;"><a href="http://rel.betterwebber.com/junk.php?id=21" target="_blank">Download the first four tutorials</a></li>
+<li style="margin-bottom:0em;"><a href="http://rel.betterwebber.com/" target="_blank">Genso's Junkyard</a> (Relsoft's website)</li>
+</ul>
+
+<h2>II. What is a viewing system?</h2>
+
+<p>A viewing system is a way to manage your 3d renders easily with a set of rules. This time we are going to use the
+left-handed system and the lookat transform. This by far is the easiest way to handle a 3d viewing system.</p>
+
+<h2>III. Types of viewing systems</h2>
+
+<p>There are actually numerous types of viewing systems. But all of them revolve around 3 mother systems.</p>
+
+<ol>
+<h3><li>Euler transforms</h3>
+
+<p>This is the pitch, yaw, roll way of viewing your world. This is what we have been using all along. Rotation from x, y and
+z axes. Since it's been already discussed in previous chapters, I won't try to delve on the subject much. This system,
+although much more "natural", has some major flaws.</p>
+
+<ol type="a">
+<li>You need 3 angles and the mouse only returns a 2d ordered pair(x, y).</li>
+<li>Angles are hard to visualize.</li>
+<li>They are prone to "gimbal" lock where angles cancel each other out. The result is vertigo. Although I have never
+experienced my engines locking, it's better to be safe than sorry.</li>
+</ol>
+
+</li>
+<h3><li>Quaternions</h3>
+
+<p>This my friend, is a way of representing vectors using quats. My opinion is, with you can do with quats, you can do
+with vectors and matrices. Quats are extensions of Complex numbers. Where complex = i, Quats = i, j, k. You you know how
+to deal with complex numbers you'd know how to deal with quats. It's just standard algebra if you can remember your (FOIL)
+technique in multiplying binomials. They're not that hard, and lots of people use them not even knowing how to do quat
+arithmetic, since there are numerous premade stuff on the net to do Quat operations. :*)</p>
+
+<dl>
+<dd><p>Pros:</p>
+
+<ol type="a">
+<li>Eliminates gimbal lock</li>
+<li>Great in intepolation</li>
+<li>Sounds cooler</li>
+</ol>
+
+</dd>
+<dd><p>Cons:</p>
+
+<ol type="a">
+<li>Probably a fad/trend</li>
+<li>You still have to convert from euler angles> quats > matrices to transform points.</li>
+<li>Most open domain quat operations are in C and this is a QB mag. :*)</li>
+</ol>
+
+</dd></dl>
+
+</li>
+<h3><li>The lookat transform</h3>
+
+<p>This is what I will be discussing in detail from this point onwards. After making countless, looking good, running
+well 3d engines, I became sick of managing angles. So I asked myself: "What if I there is a way to transform your world
+space using just 2 points?". The reasons being that, in the real world we only need two points to look. The one we are
+looking at and the one looking (that's us).</p>
+
+<p>I must admit that I didn't know what the lookat transform does back then as I only heard it from UGL's U3d module
+by blitz and v1ctor (not their first names). And since only they use it and it's not opensource, I had no way of knowing
+that it was what I needed. So what I did was try to think of some ways that I could transform my points using 2
+coordinates.</p>
+
+<p>Since I know that transforming a point in 3d space requires 3 vectors, all I needed to do was to find values for
+these vectors. Now I know my two points/coords. Say the camera point and the point we would look at:</p>
+
+<p>(cx, cy, cz) = camera(eye)</p>
+
+<p>(tx, ty, tz) = target(what we are looking)</p>
+
+<p>Finding the 1st(forward) and 3rd(right) vectors are easy enough. To find the vectors:</p>
+
+<div class="code">
+Forward = target - camera<br />
+</div>
+
+<p>or:</p>
+
+<div class="code">
+Forward.x = target.x - camera.x<br />
+Forward.y = target.y - camera.y<br />
+Forward.z = target.z - camera.z<br />
+</div>
+
+<p align="center"><img src="forward.png"></p>
+
+<div class="code">
+Right = Cross(Forward x Up)<br />
+</div>
+
+<p>This is assuming I already know my up vector.</p>
+
+<p align="center"><img src="right.png"></p>
+
+<p>The problem is, how the hell do I find the up vector? At that time, I had no idea. My first solution is to align the
+forward, up and right vectors with the x, y and z axes. Not good enough since I have to use euler angles again. Next was
+to ask my friends at Qbasicnews on how to find the up vector. No one was able to give me the right answer, as all the
+links posted pointed to dead ends. Them I tried to "guess" the up vector with nasty results. I was almost about to give
+up on the matter when I saw a code made by TOSHI HORIE on how to find the right vector!!! After reading the code, I saw
+that the solution was staring me in the face that after reading the code, I would have liked to kick myself where it hurts
+a lot. :*(</p>
+
+<p>The solution was actually very simple: "The up vector is your Y-AXIS!!!". Yep good ol' (0,1,0). "Would somebody kick
+my ballz?" j/k. So I now know how to calculate all the vectors, the only thing that remains is aligning all the vectors
+to your camera coord. This job is handled by the vector operations:</p>
+
+<ol>
+<li>Cross product</li>
+<li>Dot product </li>
+<li>vector projection</li>
+</ol>
+
+<p>See, I told you to read the previous chapters. These operations are discussed in detail in
+<a href="http://www.phatcode.net/articles.php?id=214" target="_blank">Chapter 3</a> of the series. So to make a matrix
+which transforms the points using the camera vector:</p>
+
+<div class="code">
+Pseudocode:<br />
+<br />
+1. Find forward vector<br />
+<br />
+2. Normalize it <br />
+<br />
+3. Make your up vector (0,1, 0)<br />
+<br />
+4. Align your up vector into the camera origin by subtracting the vector projection of forward from Up.<br />
+<br />
+5. Get their cross product to get the right vector.<br />
+<br />
+6. Smack those values in the transformation matrix and transform your points.<br />
+</div>
+
+<p>To align the up vector to the camera origin, we need to find the projection of U(up) to F(forward) by dropping a
+perpendicular from U's head to F. This vector, which actually lies in the direction of F is the projection of U to F.
+Now what good would this be? Well we could get the Y(up) component of the Up vector be subracting the X(forward) component
+thereby, aligning the Up vector with the Forward vector's origin. The resulting vector, after Y is copied to Up is a vector
+perpendicular to the Forward vector.</p>
+
+<ol>
+<li>Vector projection
+
+<p align="center"><img src="project.png"></p>
+
+</li>
+<li>Perpendicular vector after aligning
+
+<p align="center"><img src="align.png"></p>
+
+</li>
+</ol>
+
+<p>Here's the lookat function I made. Be sure to note of the up vector as we will have fun with it later on. :*)
+Matrix.Setcamera is just a function to smack the lookat transform's vector components to a matrix.</p>
+
+<p>Now you only have to use the resulting matrix to transform your points and they would orient themselves the way we
+wanted to.</p>
+
+<p>QB code:</p>
+
+<div class="code">
+SUB Matrix.Lookat (M!(), Target AS Vector, Camera AS Vector) STATIC<br />
+'This sub returns a trasformation matrix defined fom 3 vectors U,F,R<br />
+'This type of viewing system is perfect for FPS's. ;*)<br />
+'I intentionally left out the roll angle since I have really no use for it.<br />
+<br />
+<br />
+DIM F AS Vector 'Forward vector<br />
+DIM U AS Vector 'Up vector<br />
+DIM R AS Vector 'Right vector<br />
+<br />
+<br />
+F.x = Target.x - Camera.x<br />
+F.y = Target.y - Camera.y<br />
+F.z = Target.z - Camera.z<br />
+<br />
+Vector.Normalize F 'normalize forward vector<br />
+<br />
+U.x = 0<br />
+U.y = 1<br />
+U.z = 0<br />
+<br />
+<br />
+Vector.Normalize U<br />
+<br />
+Dot! = Vector.Dot!(F, U)<br />
+<br />
+U.x = U.x - F.x * Dot! 'Align U to F<br />
+U.y = U.y - F.y * Dot!<br />
+U.z = U.z - F.z * Dot!<br />
+<br />
+<br />
+Vector.Normalize U 'normalize the Up vector<br />
+<br />
+Vector.Cross R, U, F 'R = normal to plane f and u<br />
+<br />
+Vector.Normalize R<br />
+<br />
+'Set up camera matrix<br />
+Matrix.SetCamera M!(), R, U, F<br />
+<br />
+END SUB<br />
+<br />
+&nbsp;<br />
+<br />
+SUB Matrix.SetCamera (M!(), R AS Vector, U AS Vector, F AS Vector)<br />
+' [ Rx Uy Fz 0 ]<br />
+' [ Rx Uy Fz 0 ]<br />
+' [ Rx Uy Fz 0 ]<br />
+' [ 0 0 0 1 ]<br />
+<br />
+Matrix.SetIdentity M!()<br />
+<br />
+M!(1, 1) = R.x<br />
+M!(1, 2) = R.y<br />
+M!(1, 3) = R.z<br />
+<br />
+M!(2, 1) = U.x<br />
+M!(2, 2) = U.y<br />
+M!(2, 3) = U.z<br />
+<br />
+M!(3, 1) = F.x<br />
+M!(3, 2) = F.y<br />
+M!(3, 3) = F.z<br />
+<br />
+END SUB<br />
+</div>
+
+<p>Now that we know how to transform points using the lookat transform, we would need to design a systems based on the
+mouse coordinates. Since the mouse has only 2d coords, we only need 2 angles to find a point in 3d space. How do we
+do that? Well, if you have read chapter 3 of the 3d series I made, it would certainly occur to you that we have to use
+the spherical coordinate system. I told ya. :*) For those who have forgotten the equations in converting spherical
+coordinates to rectangular coords:</p>
+
+<div class="code">
+CamLookAT.x = SIN(Phi!) * COS(Theta!) <br />
+CamLookAT.z = SIN(Phi!) * SIN(Theta!)<br />
+CamLookAT.y = COS(Phi!)<br />
+</div>
+
+<p>Where phi! = (Elevation) the angle against the horizon or your mousey and theta!=(azimuth) is the 2d angle that you
+can make from the horizon or mousex (think of a rainbow).</p>
+
+<p>How do we get Phi and Theta correctly when there are 360 degrees(2PI) in one revolution and the maximum coords of the
+mouse are just 319 and 199 respectively (in screen 13)? The answer again is conversion. For those of you who have done
+Allegro GFX and some Democoding you probably already have heard of angles ranging from 0 to 255 or 0 to 512 or any
+maxvalue which is a power of two. Don't worry we will not use those values but we will in fact, use the same hack to
+interpolate our angle increments. :*) Here's the formula:</p>
+
+<div class="code">
+Actualangle = 2*PI/Maxangle<br />
+</div>
+
+<p>Where:</p>
+
+<p>Actualangle = the value we would pass as an argument to the trig functions SIN and COS.</p>
+
+<p>2*PI = duh? It's one revolution</p>
+
+<p>Maxangle = would either be 320 or 200. :*)</p>
+
+<p>Here's the code to convert mouse coords to spherical angles. Modified a lil bit to work seamlessly. :*)</p>
+
+<div class="code">
+Theta! = 2 * -PI * (MouseX) / 320 'Azimuth<br />
+Phi! = PI * MouseY / 200&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'elevation<br />
+<br />
+CamLookAT.X = COS(Theta!) * SIN(Phi!) 'Spherical system<br />
+CamLookAT.Y = COS(Phi!)<br />
+CamLookAT.z = SIN(Theta!) * SIN(Phi!)<br />
+</div>
+
+<p>Movement (Translation) is just a matter of understanding vector mathematics I discussed in Chapter 3 (This is Chapter 5
+already). To move, we need our starting point (Camera Position), the lookat vector (Camera Lookat), and the speed we would
+like to move.</p>
+
+<p>To get the speed (Magnitude), we multiply the lookat vector by a scalar value. ie. Scalar multiplication.:</p>
+
+<div class="code">
+xmove = CamLookAT.X * speed<br />
+ymove = CamLookAT.Y * speed <br />
+zmove = CamLookAT.z * speed<br />
+</div>
+
+<p>To walk forward, we subtract the speed of lookat vector from our camera position (Note that speed here is 3):</p>
+
+<div class="code">
+Campos.X = Campos.X - CamLookAT.X * 3<br />
+Campos.Y = Campos.Y - CamLookAT.Y * 3<br />
+Campos.z = Campos.z - CamLookAT.z * 3<br />
+</div>
+
+<p>To move backward do the reverse:</p>
+
+<div class="code">
+Campos.X = Campos.X + CamLookAT.X * 3<br />
+Campos.Y = Campos.Y + CamLookAT.Y * 3 <br />
+Campos.z = Campos.z + CamLookAT.z * 3<br />
+</div>
+ 
+<p>Since we translated the origin(the camera postion in world space, we also have to translate the origin of our camera
+lookat vector or our render wouldn't look nice. For that we add the camera position to our lookat vector. ie. vector
+addition.</p>
+
+<div class="code">
+CamLookAT.X = CamLookAT.X + Campos.X<br />
+CamLookAT.Y = CamLookAT.Y + Campos.Y<br />
+CamLookAT.z = CamLookAT.z + Campos.Z<br />
+</div>
+
+<p>Now we are ready to transform!!!</p>
+
+<p>Pseudocode:</p>
+
+<div class="code">
+1. Calculate spherical angles using mouse coords<br />
+<br />
+2. Convert spherical to rectangular coord and put the resulting values on our lookat vector.<br />
+<br />
+3. Move the camera depending on the input.<br />
+<br />
+4. Translate the lookat origin to the relative to the camera origin(vector add)<br />
+<br />
+5. Translate the matrix using the camera origin<br />
+<br />
+6. Transform the matrix using the lookat transform<br />
+<br />
+7. Transform your points.<br />
+<br />
+8. Draw<br />
+</div>
+
+<p>That's it!!! Things to remember though is that the origin of rotation is the camera position. What this means is that
+the camera is not moving but the world space is moving relative to the camera (Einstein). ;*)</p>
+
+<h3>The "Puke" cam</h3>
+
+<p>The word puke cam came from a review of Spy Hunter on the Ps2/Xbox I saw on TechTV. They called it puke because it
+would really puke you out of your lunch if you play the game using that mode. You are racing normally but with a rotating
+camera. Now if that's not gonna make you puke, I don't know what will.;*)</p>
+
+<p>You might think that this mode is as useless as your worn out socks but think of a plane doing a roll, and a car
+travelling on an angled road. Surely it would be nice to have a way to roll the world around your forward vector. "No!
+not another boring vector operations again!". Hardly. :*). Implementing a roll on the camera is just plain fun and plain
+easy. All we have to do is change the UP vector's orientation. "But up is (0,1,0) right?". Yep, but what if we change the
+up vector to any orientation we want? Well, it turns out that doing something with out up vector permits us to roll the
+camera. How do we roll the camera? Easy, use the polar to cartesian coordinate conversion.</p>
+
+<div class="code">
+'Calculate roll angle<br />
+ra! = RollAngle% * 3.141593 / 180<br />
+U.x = COS(ra!)<br />
+U.y = SIN(ra!)<br />
+U.z = 0<br />
+</div>
+
+<h3>Clippin' it</h3>
+
+<p>The clipping algo that I would introduce here is the easiest one. By easiest doesn't mean it's sucks. Since the
+ASM triangle filler I used already implements scanline clipping, I should know since I made it. :*), the only clipping
+we have to do is a near/far clip and 2d x, y clip. Here's the algo.</p>
+
+<div class="code">
+For every poly<br />
+&nbsp;if all z coords are &gt; 1<br />
+&nbsp; &nbsp;if all z coords are &lt; Farthest distance<br />
+&nbsp; &nbsp; &nbsp;if some x&gt; 0 or some y &gt;0 or some x &lt;319 or some y&lt;199<br />
+&nbsp; &nbsp; &nbsp; &nbsp;Poly draw =True<br />
+&nbsp; &nbsp; &nbsp;end if<br />
+&nbsp; &nbsp;end if<br />
+&nbsp; end if<br />
+next<br />
+</div>
+
+</li>
+</ol>
+
+<p><i>Editor's note: Example code for this article can be found in <a href="lookat.zip" target="_blank">lookat.zip</a>.</i></p>
+
+<p>I would have liked to discuss some more clipping techniques but I doubt that I would have enough space in this mag. For
+things that you would like to write me about, you could contact me at:</p>
+
+<p><a href="http://rel.betterwebber.com/" target="_blank">http://rel.betterwebber.com/</a><br />
+<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;</a></p>
+
+<p>Richard Eric M. Lope BSN, RN. (Relsoft/Jelly)</p>
+
+<p>Credits:</p>
+
+<p>Dr. Davidstein for his nice 3d model and texture<br />
+Plasma for SetVideoSeg<br />
+Toshi for the important Up vector<br />
+Blitz for the mouse coord to spherical angle conversion<br />
+Pete Berg for putting this up on his mag.</p>
+<div class="divide"></div>
+<table>
+<tr><td align="right"><b>Author:</b></td><td>Rel (Richard Eric M. Lope)</td></tr>
+<tr><td align="right"><b>Email:</b></td><td><a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;</a></a></td></tr>
+<tr><td align="right"><b>Website:</b></td><td><a href="http://rel.betterwebber.com/" target="_blank">http://rel.betterwebber.com/</a></td></tr>
+<tr><td align="right"><b>Released:</b></td><td>Sep 2004</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--.............................................-->
+<!--. Downloaded from Phat Code                 .-->
+<!--. http://www.phatcode.net/                  .-->
+<!--.............................................-->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="description" content="Rel explains why and how to use rotations">
+<meta name="keywords" content="Rel explains why and how to use rotations">
+<title>phatcode.net / 3D Series Chapter 1: Projection by Rel (Richard Eric M. Lope)</title>
+<style type="text/css">
+<!--
+body {font-family:verdana, geneva, helvetica, arial, sans-serif; font-size:x-small; color:#000000; background:#ffffff;}
+p, table, td {font-size:x-small; line-height:150%;}
+li {line-height:150%; margin-bottom:1em;}
+h1 {font-size:large;}
+h2 {font-size:medium;}
+h3 {font-size:small;}
+a:link {color:#0000ff;}
+a:visited {color:#0000ff;}
+a:active {color:#0000ff;}
+a:hover {color:#0000aa;}
+.code {font-family:courier new, courier; font-size:x-small; line-height:130%; color:#000000; background-color:#dddddd; padding:10px; margin:15px; border:#000000 solid 2px;}
+.border {border: #000000 solid 1px;}
+.divide {border: #000000 solid 1px; margin-top:10px; margin-bottom:10px;}
+-->
+</style>
+</head>
+<body>
+<h1 align="center">3D Series Chapter 1: Projection</h1>
+<h3 align="center">by <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">Rel</a> (Richard Eric M. Lope)</h3>
+<div class="divide"></div>
+<h2>Entering the 3rd dimension...</h2>
+
+<p>Hi there!  Relsoft again back with an article for you. :*). This article is the first of a series of 3d articles
+that I'll be serializing at <a href="http://www.qbasicnews.com/" target="_blank">qbasicnews.com</a>. I don't know
+how far I could take you or how many chapters will I make. It depends upon the user feedback and my free time. ;*)</p>
+
+<p>I'm most likely to cover a lot of things that after you've read the whole series, you're likely to be able to make
+your own FPS render, a 3d strategy game or even a Ragnarok style engine. ;*)</p>
+
+<h2>I. Course outline</h2>
+
+<p>What I will be covering in this series are listed below:</p>
+
+<ol>
+<li>3d Projection
+  <ol type="a">
+    <li style="margin-bottom:0em;">Theory</li>
+    <li style="margin-bottom:0em;">Camera</li>
+    <li style="margin-bottom:0em;">Translation</li>
+  </ol>
+</li>
+
+<li>2d and 3d rotations
+  <ol type="a">
+    <li style="margin-bottom:0em;">Sin/Cos</li>
+    <li style="margin-bottom:0em;">Polar coordinates</li>
+    <li style="margin-bottom:0em;">Proof of rotation</li>
+    <li style="margin-bottom:0em;">Transformation</li>
+    <li style="margin-bottom:0em;">3d Optimization</li>
+  </ol>
+</li>
+
+<li>3d coordinate systems
+  <ol type="a">
+    <li style="margin-bottom:0em;">Cartesian</li>
+    <li style="margin-bottom:0em;">Spherical</li>
+    <li style="margin-bottom:0em;">Cylindrical</li>
+    <li style="margin-bottom:0em;">3d Model generation</li>
+    <li style="margin-bottom:0em;">Polygon 101</li>
+  </ol>
+</li>
+
+<li>Polygon fills
+  <ol type="a">
+    <li style="margin-bottom:0em;">Vectors</li>
+    <li style="margin-bottom:0em;">wireframe</li>
+    <li style="margin-bottom:0em;">Flat</li>
+  </ol>
+</li>
+
+<li>Normals and lightsourcing
+  <ol type="a">
+    <li style="margin-bottom:0em;">More on Vectors</li>
+    <li style="margin-bottom:0em;">Cross product</li>
+    <li style="margin-bottom:0em;">Dot Product
+      <ul>
+        <li style="margin-bottom:0em;">Lambert shading</li>
+        <li style="margin-bottom:0em;">Gouraud shading</li>
+        <li style="margin-bottom:0em;">Phong shading</li>
+      </ul>
+    </li>
+    <li style="margin-bottom:0em;">Moving Lightsource</li>
+    <li style="margin-bottom:0em;">Multiple Light</li>
+    <li style="margin-bottom:0em;">TextureMapping</li>
+  </ol>
+</li>
+
+<li>Multiple objects
+  <ol type="a">
+    <li style="margin-bottom:0em;">Sorting Methods</li>
+    <li style="margin-bottom:0em;">Visibility check</li>
+    <li style="margin-bottom:0em;">Depth-Buffering</li>
+  </ol>
+</li>
+
+<li>Designing a 3d game engine
+  <ol type="a">
+    <li style="margin-bottom:0em;">Camera as a vector</li>
+    <li style="margin-bottom:0em;">Matrices</li>
+  </ol>
+</li>
+
+<li>I don't know yet. ;*)</li>
+</ol>
+
+<h2>II. Introduction</h2>
+
+<p>The purpose of this article is to try to explain the reasons behind 3d projection and a little on 2d rotation.
+3d is only as hard, or as easy, as you want it to be. Don't be afraid as I'll take you to the world of 3d step
+by step.</p>
+
+<p>What you need to be able to run the sample programs that I will be throwing from time to time is any flavor of
+QuickBASIC (QBASIC, QB 4.5, 7.1, etc). A little experience in algebra and Trig is also a plus but not necessary. I
+will also try to explain optimization techniques as we go along the whole series. ;*)</p>
+
+<h2>III. 3d cartesian coordinate system</h2>
+
+<p>The 3d cartesian coordinate system is almost like the 2d cartesian coordinate system that we grew up with, only
+with an extra dimension: The Z axis. <i>*There are several other 3d coordinate systems like spherical and cylindrical.
+I will explain them to you in detail in future issues, but when I talk 3d coordinates for now, its the cartesian
+coordinate system unless specified.</i></p>
+
+ie.
+<ol type="a">
+<li>2d
+  <dl><dd>p(x,y)</dd></dl>
+</li>
+<li>3d
+  <dl><dd>P(x,y,z)</dd></dl>
+</li>
+</ol>
+
+<p>But how do we define a 3d coordinate? Where does the z-axis go? As we know already, in 2d coordinate, the x-axis
+is going to the right and the y-axis is going up.  The 2 axes (plural for axis) intersect at p(0,0). Read as
+"Point 0,0" where the first value is the x (abscissa) and the second value is the y (ordinate). P(0,0) is also called
+the "Origin". They are also PERPENDICULAR to each other. Perpendicular means a line, plane or a ray (vector) which
+has a union of 90 degrees. Meaning they form a "+" when they intersect.</p>
+
+<div align="center">
+<img src="perp.png">
+</div>
+
+<p>See how all the angles (1, 2, 3, 4) are all 90 degrees? That's the essence of perpendicularity. Also be sure that
+you understand this concept as perpendicularity is used on almost all things that got to do with 3d. <i>*Perpendicular
+lines/Planes/rays are also called "orthogonal".</i></p>
+
+<p>There is not that much difference in 3d, all the axes are perpendicular to each other. ie:
+Z axis is perpendicular to the XY Plane, Y axis is perpendicular to the XZ plane as the X axis to the YZ plane.
+Now how about the directions the axes go? Well, there are two ways to define a 3d system. The "RIGHT-HANDED" and the
+"LEFT-HANDED" systems. The choice is yours to make, or me in this case because I'm the one writing this article.</p>
+
+<div align="center">
+<img src="3dsys.png">
+</div>
+
+<ol type="a">
+<li>Left handed system (Fig. 2)
+  <dl>
+    <dd>The left-handed system means that when increased:
+      <dl><dd>x goes right</dd></dl>
+      <dl><dd>y goes Up</dd></dl>
+      <dl><dd>z goes into the screen (away from you)</dd></dl>
+    </dd>
+  </dl>
+</li>
+<li>Right Handed system (Fig. 1)
+  <dl>
+    <dd>When increased:
+      <dl><dd>x goes right</dd></dl>
+      <dl><dd>y goes up</dd></dl>
+      <dl><dd>z goes out of the screen (Into you)</dd></dl>
+    </dd>
+  </dl>
+</li>
+</ol>
+
+<p>Since most books use the right handed system, I'll use that system. Another reason is that the coordinates when
+plotted on the screen, resembles a real-world system. Hey, I'm right handed. ;*)</p>
+
+<h2>IV. 3d to 2d projection</h2>
+
+<p>As you might have guessed, QB has no PSET3d or LINE3d routine so we have to make one. :*) The beauty of learning
+the theories and principles behind how things work is that you won't get lost at discussions on forums. :*) So let
+me start by the principle:</p>
+
+<p>Normal way: <i>"The farther the thing from the viewer the smaller it gets"</i><br />
+Jocke's way: <i>"I'm gonna kick this ball so far you won't be able to see it."</i><br />
+Math way: <i>"Distance is inversely proportional to the size of an object"</i></p>
+
+<p>Trying to make an equation using Jocke's or the English statement would be very hard. So we'll use the Math way:</p>
+
+<div class="code">
+Size = 1/distance<br />
+</div>
+
+<p>so:</p>
+
+<div class="code">
+Newsize = Size/Distance<br />
+</div>
+
+<p>assume:</p>
+
+<div class="code">
+a.<br />
+&nbsp; &nbsp; OrigSize = 100<br />
+&nbsp; &nbsp; Distance = 1<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;= 100/1<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;= 100<br />
+b.<br />
+&nbsp; &nbsp; &nbsp;Origize = 100<br />
+&nbsp; &nbsp; Distance = 50<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;= 100/50<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;= 2<br />
+</div>
+
+<p><i>*This is just an approximation.  Just to show you the relationship of size and distance.</i></p>
+
+<p>Now you would want to project and object but how do we do it with the knowledge that we have already learned?
+Well, First, we have to decide where z=0 is. Turns out that a good way to define z=0 is a number of units away from
+you. Which means that you can see it when you look at your monitor. A good value is 256. Why 256?  Well, this is not
+entirely the law since you could make it as small or as big as you want it to be, but 256 is a good multiplier (or
+any power of 2 value) as you will see later. Secondly, where to put the monitor in our 3d space. Think of your monitor
+as a <b>"camera"</b> that points onto the 3d space and the screen as the LENS (camera lens) perpendicular to the z-axis
+(Yes, your XY plane). Since (0,0,0) or z=0 is at a distance of 256 looking at the negative direction, our Lens should
+be 0+256. So that the coordinate of our lens is (0,0,256).</p>
+
+<p>Anything more than 256 is behind the camera and should not be plotted. Remember that we are looking on the negative z
+in right-handed systems.</p>
+
+<p><i>And why did we use 256?</i></p>
+
+<p>Seasoned programmers would know that 256 is a power of two. Since you can use shifts to multiply and divide, you
+could make your renders faster by miles as shifts are way faster than divs or muls. ;*)</p>
+
+<p>In screen 13, the dimensions of the screen is 320*200 and its center is (160,100). We know that at z=0, the
+relationship of each x,y,z units is that x and y is one unit wide. So plotting (8,5,0):</p>
+
+<div class="code">
+Distance = 256<br />
+&nbsp;screenx = 160+x<br />
+&nbsp;screeny = 100-y (the screen y-wise is reversed)<br />
+</div>
+
+<p>Then:</p>
+
+<div class="code">
+Screenx = 160 + 8 = 168<br />
+Screeny = 100 - 5 = 95<br />
+Pset(168,95), col<br />
+</div>
+
+<p>How about if z = 128? (8,5,128)</p>
+
+<p>Then:</p>
+
+<div class="code">
+distance = 256 -128<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;= 128<br />
+</div>
+
+<p>128 is nearer which means the size of the units should increase. But how much? Since 128 is half of 256, our units
+should be 2x (twice) the size of the units at z=0. So...</p>
+
+<div class="code">
+screenx = 160+x*2=160+8*2<br />
+screeny = 100-y*2=100-y*2<br />
+</div>
+
+<p>Then:</p>
+
+<div class="code">
+Screenx = 160 + 16 = 176<br />
+Screeny = 100 - 10 = 90<br />
+Pset(168,95), col<br />
+</div>
+
+<p>Pretty easy huh?  Putting it all together, the projection would look like this:</p>
+
+<div class="code">
+Distance = LENS-z<br />
+&nbsp;screenx = xcenter+(LENS*x/Distance)<br />
+&nbsp;screeny = ycenter-(LENS*y/Distance)<br />
+</div>
+
+<p>Now let me explain how each component affects the whole projection formula:</p>
+
+<h2>1. Lens</h2>
+
+<p>We know that LENS, the lens of our camera or monitor in this case, is a multiplier to give your projection a field
+of view(FOV) and since the camera is 256 units away from (0,0,0) we would want the value of our lens to have a direct
+correlation with distance. eg:</p>
+
+<div class="code">
+&nbsp; &nbsp; &nbsp; &nbsp;z = 0<br />
+Distance = 256-0 = 256<br />
+&nbsp; &nbsp; Lens = 256<br />
+&nbsp; &nbsp; &nbsp; &nbsp;x = 8<br />
+&nbsp;xcenter = 160<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;= (256*8/256)+160 = 168<br />
+</div>
+
+<p><i>(See the relationship already?)</i></p>
+
+<p><i>* some people use a value of Lens=1 so that it weeds out 2 muls or shifts in the actual projection formulas but in
+my experience, the objects does not look "natural".</i></p>
+
+<h2>2. Distance</h2>
+
+<p>This is just how far a 3d pixel is away from the camera. Since we look in the negative direction,
+"The farther the distance, the smaller the z value. ie. p(0,0,-100) is further than p(0,0,100). Let us see if this holds
+true in equation form.</p>
+
+<div class="code">
+a. (0,0,-100)<br />
+&nbsp; &nbsp; Distance = 256-(-100)<br />
+&nbsp; &nbsp; &nbsp; &nbsp;'distribute the [-] sign:<br />
+&nbsp; &nbsp; Distance = 256+100<br />
+&nbsp; &nbsp; Distance = 356<br />
+&nbsp; &nbsp; &nbsp; <br />
+b. (0,0,100)<br />
+&nbsp; &nbsp; Distance = 256-(+100)<br />
+&nbsp; &nbsp; Distance = 256-100<br />
+&nbsp; &nbsp; Distance = 156<br />
+</div>
+
+<p>Ahem! 356>156. ;*)</p>
+
+<p>What about z=>256 or distance is 0 or less? Well, unless you want to poke yourself in the eye, you wouldn't want to
+plot em. ;*)  Plotting at distance=0 is technically correct but you had to change your projection formula because n/0 is
+undefined. And in geometry, <i>"Distance is always positive :*)"</i>  Here's the formula:</p>
+
+<div class="code">
+Distance = 0<br />
+&nbsp;screenx = xcenter+(LENS*x)<br />
+&nbsp;screeny = ycenter-(LENS*y)<br />
+</div>
+
+<p>
+To test your intelligence, I'll let you think about it yourself. ;*)</p>
+
+<h3>FINAL PROJECTION EQUATIONS!!!</h3>
+
+<div class="code">
+Distance = LENS-z<br />
+&nbsp;screenx = xcenter+(LENS*x/Distance)<br />
+&nbsp;screeny = ycenter-(LENS*y/Distance)<br />
+</div>
+
+<p>or (since addition is commutative):</p>
+
+<div class="code">
+Distance = LENS-z<br />
+&nbsp;screenx = (LENS*x/Distance)+xcenter<br />
+&nbsp;screeny = -(LENS*y/Distance)+ycenter<br />
+</div>
+
+<p>Now let's see if the projection equations would return the same values for (8,5,128): 
+Remember that we returned x=176, y=90)</p>
+
+<div class="code">
+Distance = 256-128=128<br />
+&nbsp;screenx = (256*8/128) + 160<br />
+&nbsp;screeny =-(256*5/128) + 100<br />
+=<br />
+&nbsp;screenx = (2048/128) + 160<br />
+&nbsp;screeny =-(1280/128) + 100<br />
+=<br />
+&nbsp;screenx = (16) + 160 = 176<br />
+&nbsp;screeny =-(10) + 100 = 90<br />
+</div>
+
+<p>Ahem...;*)</p>
+
+<h2>V. Translation</h2>
+
+<p>Translation is just movement of a point from one location to another. To simplify things, I put the translation
+coords in the form of a camera offsets, camx,camy,camz.</p>
+
+<p>Moving the location of the point is just as simple as adding or subtracting values to the camera offsets and
+subtracting those components; x,y & z from p(x,y,z) ie:</p>
+
+<div class="code">
+Xtranslated = x - camx<br />
+Ytranslated = y - camx<br />
+Ztranslated = z - camx<br />
+</div>
+
+<h2>VI.  Putting it in action</h2>
+
+<p>Now for the fun part, plotting! Let's start by the simplest of all "models" (When I say models i mean an array of
+points that define a 3d object), the plane. In this case we want to plot a grid of 16*16 plane. As we would want the
+grid to be centered at x=0 and y=0, the starting x and y values of our grid is negative. We also would want to start
+at z=0 adding an increment(20) for every y-loop.  We also would want to scale the distance between each point, in this
+case 4.</p>
+
+<div class="code">
+Gsize = 16<br />
+size% = Gsize * Gsize&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'16 * 16 grid<br />
+DIM SHARED Plane(size% - 1) AS Point3D&nbsp; &nbsp; 'dim out plane<br />
+<br />
+Scale = 4&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'scale factor<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'change to a smaller if you want to<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'reduce the size.<br />
+z = 0&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'start 256 units away from screen<br />
+i = 0&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'index for pixels<br />
+<br />
+HalfSize = Gsize \ 2&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; '1/2 of our grid for centering<br />
+FOR y = HalfSize - 1 TO -HalfSize STEP -1&nbsp; &nbsp; &nbsp;'loop through it<br />
+&nbsp; &nbsp; FOR x = HalfSize - 1 TO -HalfSize STEP -1 'and calculate each coord<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; Plane(i).x = x * Scale&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'make the model bigger<br />
+&nbsp; &nbsp; &nbsp; &nbsp; Plane(i).y = y * Scale<br />
+&nbsp; &nbsp; &nbsp; &nbsp; Plane(i).z = z<br />
+&nbsp; &nbsp; &nbsp; &nbsp; i = i + 1&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'increment array index<br />
+&nbsp; &nbsp; NEXT x<br />
+&nbsp; &nbsp; z = z + 20&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'go out into the screen 20 units every line.<br />
+NEXT y<br />
+</div>
+
+<p>Now to project it,</p>
+
+<ol>
+<li>start</li>
+<li>read pixel at location i</li>
+<li>translate the pixel using p(x,y,z) - cam(x,y,z)</li>
+<li>project each pixel</li>
+<li>Plot</li>
+<li>If I&lt;maxpoints go to start else end</li>
+</ol>
+
+<div class="code">
+FOR i = 0 TO UBOUND(Plane)<br />
+&nbsp; &nbsp; sx! = Plane(i).x - camx%&nbsp; &nbsp; &nbsp;'coords<br />
+&nbsp; &nbsp; sy! = Plane(i).y - camy%&nbsp; &nbsp; &nbsp;'sub tracted by the<br />
+&nbsp; &nbsp; sz! = Plane(i).z - camz%&nbsp; &nbsp; &nbsp;'camera<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'we can still directly subtract<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'camera offsets to our original<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'coords as we are not rotating yet. ;*)<br />
+<br />
+&nbsp; &nbsp; Distance% = (LENS - sz!)&nbsp; &nbsp; &nbsp;'get Distance<br />
+&nbsp; &nbsp; IF Distance% &gt; 0 THEN&nbsp; &nbsp; &nbsp; &nbsp; 'if dist&gt;&gt;0 then<br />
+&nbsp; &nbsp; &nbsp; &nbsp; 'Projection formula<br />
+&nbsp; &nbsp; &nbsp; &nbsp; x% = XCENTER + (LENS * sx! / Distance%) <br />
+&nbsp; &nbsp; &nbsp; &nbsp; y% = YCENTER - (LENS * sy! / Distance%) <br />
+&nbsp; &nbsp; &nbsp; &nbsp; PSET (x%, y%), 15&nbsp; &nbsp; &nbsp; &nbsp; 'Draw each star<br />
+&nbsp; &nbsp; ELSE<br />
+&nbsp; &nbsp; &nbsp; &nbsp; 'do nothing<br />
+&nbsp; &nbsp; &nbsp; &nbsp; 'you wouldn't wan't to<br />
+&nbsp; &nbsp; &nbsp; &nbsp; 'divide by 0 would ya? :*)<br />
+&nbsp; &nbsp; &nbsp; &nbsp; 'and in geometry, distance is<br />
+&nbsp; &nbsp; &nbsp; &nbsp; 'always positive. ;*)<br />
+&nbsp; &nbsp; END IF<br />
+NEXT i<br />
+</div>
+
+<p>Now here's the example file of a projected plane:<br />
+(camera is controlled by AZSXDC)<br />
+<a href="project.bas" target="_blank">project.bas</a></p>
+
+<p>You can even project texts:<br>
+<a href="projchar.bas" target="_blank">projchar.bas</a></p>
+
+<p>Here's how you can apply the projection equations to a starfield:<br />
+<a href="projstar.bas" target="_blank">projstar.bas</a></p>
+
+<h2>VII. Using sprites instead of pixels</h2>
+
+<p>Pixels alone tend to be boring after a while.  So why not use sprites?  Considering we also have to project the
+size of the sprite or tile, we can't use the normal QB PUT routine, so we have to make a stretch sprite routine for
+this purpose alone.  The algo behind the stretch sprite routine is pretty trivial so I won't explain it here in
+detail. All you have to remember is that you could zoom or pan on a sprite depending on the parameters, NewHeight
+and NewWidth.</p>
+
+<p>For the actual algo in calculating the new dimensions, here's the formula:</p>
+
+<div class="code">
+NewHeight = OldHeight*LENS/Distance%<br />
+&nbsp;NewWidth = OldWidth*LENS/Distance%<br />
+</div>
+
+<p>OldWidth and OldHeight are the actual dimensions of the sprite. Ie. If you GET(0,0)-(15,15),Array then the size
+of the sprite is 16*16. So OldHeight=16 and OldWidth=16.</p>
+
+<p>Distance is the same distance in out projection equations. Same with the LENS. I'll let you figure out the
+rationale behind the equations yourself. :*)</p>
+
+<p>Here's the sample file:<br />
+<a href="meteor.bas" target="_blank">meteor.bas</a><br />
+<a href="stars.bas" target="_blank">stars.bas</a></p>
+
+<p>Hope you've learned something from this. The best way to learn though is to just play with the values, running the
+program and see the effect of the changed values.</p>
+
+<p>Next time, I will teach you 2d and 3d rotations, polar coodinates, other forms of transformation besides translation,
+optimizations of 3d rotations using constants, and probably if space will provide 3d model generation (The math way).
+So you might want to read on:</p>
+
+<ol>
+<li>Trig Functions
+  <dl><dd>Sin and Cos only</dd></dl>
+</li>
+<li>Trig Identities
+  <dl><dd>Cos/Sin addition laws</dd></dl>
+</li>
+<li>Right Triangle relationships in Trig functions</li>
+<li>Polar to cartesian coordinate conversion</li>
+</ol>
+
+<p><i>*Don't worry even if you don't know a thing about those things I mentioned because I will be teaching you all
+of those next issue as if you're am 8 year-old kid. ;*)</i></p>
+
+<p>So until next time, Relsoft signing out. Happy coding!!!!</p>
+
+<p><b>Relsoft 2003</b></p><div class="divide"></div>
+<table>
+<tr><td align="right"><b>Author:</b></td><td>Rel (Richard Eric M. Lope)</td></tr>
+<tr><td align="right"><b>Email:</b></td><td><a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;</a></a></td></tr>
+<tr><td align="right"><b>Website:</b></td><td><a href="http://rel.betterwebber.com/" target="_blank">http://rel.betterwebber.com/</a></td></tr>
+<tr><td align="right"><b>Released:</b></td><td>2004</td></tr>
+</table>
+</body>
+</html>

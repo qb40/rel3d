@@ -1,0 +1,966 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--.............................................-->
+<!--. Downloaded from Phat Code                 .-->
+<!--. http://www.phatcode.net/                  .-->
+<!--.............................................-->
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="description" content="Examines matrices and their applications">
+<meta name="keywords" content="Examines matrices and their applications">
+<title>phatcode.net / 3D Series Chapter 4: Matrices by Rel (Richard Eric M. Lope)</title>
+<style type="text/css">
+<!--
+body {font-family:verdana, geneva, helvetica, arial, sans-serif; font-size:x-small; color:#000000; background:#ffffff;}
+p, table, td {font-size:x-small; line-height:150%;}
+li {line-height:150%; margin-bottom:1em;}
+h1 {font-size:large;}
+h2 {font-size:medium;}
+h3 {font-size:small;}
+a:link {color:#0000ff;}
+a:visited {color:#0000ff;}
+a:active {color:#0000ff;}
+a:hover {color:#0000aa;}
+.code {font-family:courier new, courier; font-size:x-small; line-height:130%; color:#000000; background-color:#dddddd; padding:10px; margin:15px; border:#000000 solid 2px;}
+.border {border: #000000 solid 1px;}
+.divide {border: #000000 solid 1px; margin-top:10px; margin-bottom:10px;}
+-->
+</style>
+</head>
+<body>
+<h1 align="center">3D Series Chapter 4: Matrices</h1>
+<h3 align="center">by <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">Rel</a> (Richard Eric M. Lope)</h3>
+<div class="divide"></div>
+<h2>Introduction</h2>
+
+<p>Matrices are useful in 3d graphics. Not only are they fast, but once you get used to them, it makes things a lot simpler.
+Matrices are better than standard equations for these reasons:</p>
+
+<ol>
+<li>Actions (transformations) such as scaling, rotation and translation can be easily kept track because you only need to
+keep track of the matrix and forget about your 3d coordinates.</li>
+<li>It's a one-pass transform. Which means you can make as many matrices as you want and combine it in one single matrix
+to do all the transformations for you. Simplicity at its best!!!</li>
+<li>You are not limited to just the XYZ angle system when viewing your virtual world. You could make a Lookat function to
+make things even simpler!!! (I'll get to that in another article)</li>
+</ol>
+
+<p>For this article, I'm going to discuss matrices and their applications. I'm gonna start with the use of matrices in
+solving systems of linear equations, the basic operations on matrices and their applications in 3d graphics. I might be
+able to put in some code and algos in between. Don't worry, matrices are not as hard as you thought they are. :*). I'm
+gonna be discussing those things you'd need in making a 3d game engine using matrices. Which means that most matrix stuff
+I'm going to include in here are the easy ones. So without further ado....</p>
+
+<h2>Systems of Linear Equations</h2>
+
+<p>Remember the linear equation...</p>
+
+<div class="code">
+ax + by = c<br />
+</div>
+
+<p>No? How about this?</p>
+
+<div class="code">
+y = mx + b<br />
+</div>
+
+<p>These two equations are just two of the many forms of linear equations. The first one (ax+by=c) is the "standard" form
+and y=mx+b is the "slope-intercept" form. We'll be discussing the standard form when dealing with matrices.</p>
+
+<p>Given 2 equations:</p>
+
+<div class="code">
+2x - 3y = 1<br />
+</div>
+
+<p>and</p>
+
+<div class="code">
+3x + 2y = 8<br />
+</div>
+
+<p>How do you get the solution to both equations? The solution is actually the "intersection" of both lines defined by
+the above equations. For those who have done some algebra, we know that there are a number of ways to find the solution.</p>
+
+<p>They are:</p>
+
+<ol>
+<li style="margin-bottom:0em;">Graphing</li>
+<li style="margin-bottom:0em;">Substitution</li>
+<li style="margin-bottom:0em;">Elimination</li>
+</ol>
+
+<p>Solving via elimination:</p>
+
+<div class="code">
+2x - 3y = 1&nbsp; &nbsp; (equ 1)<br />
+3x + 2y = 8&nbsp; &nbsp; (equ 2)<br />
+</div>
+
+<p>Make the coeficients of x the same by multiplying equ 1 by 3 and equ 2 by 2 then subtract.</p>
+
+<div class="code">
+3*[2x - 3y = 1]*3<br />
+2*[3x + 2y = 8]*2<br />
+<br />
+6x - 9y = 3<br />
+6x + 4y = 16<br />
+------------------<br />
+&nbsp; - 13y = -13 ---&gt; /-13<br />
+&nbsp; &nbsp; &nbsp; y = 1<br />
+</div>
+
+<p>Using back substitution (equ 1):</p>
+
+<div class="code">
+2x - 3(1) = 1<br />
+&nbsp; &nbsp; &nbsp; &nbsp;2x = 1 + 3 ---&gt;/2<br />
+&nbsp; &nbsp; &nbsp; &nbsp; x = 2<br />
+</div>
+
+<p>The solution is (2,1)</p>
+
+<p>However when made into code, this is very cumbersome and not flexible. What we need is an algorithmic way to solve the
+system. And the answer is the matrix. How do we go about solving this system using a matrix? First let me discus the
+ECHELON method of solving this system, as it's almost parallel to the matrix method except for the last part.</p>
+
+<p>Solving via the Echelon method:</p>
+
+<div class="code">
+2x - 3y = 1&nbsp; &nbsp; (equ 1)<br />
+3x + 2y = 8&nbsp; &nbsp; (equ 2)<br />
+</div>
+
+<p>Multiply both sides of equ 1 by 1/2 so that x will have a coefficient of 1.</p>
+
+<div class="code">
+&nbsp;x - 3/2y = 1/2&nbsp; &nbsp; (equ 3)<br />
+3x +&nbsp; &nbsp;2y = 8<br />
+</div>
+
+<p>Eliminate x from equ 2 by adding (-3) times equ 3 to equ 2.</p>
+
+<div class="code">
+&nbsp; &nbsp; &nbsp;-3 *[x - 3/2y = 1/2]* -3<br />
+&nbsp; =<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -3x + 9/2y = -3/2<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;3x + 2y = 8&nbsp; &nbsp; &nbsp;--&gt; make 2y and 8 similar to 9/2 y and -3/2.<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ie. 2y= 4/2y ; 8 = 16/2<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; -3x + 9/2y = -3/2<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;3x + 4/2y = 16/2<br />
+&nbsp; &nbsp; &nbsp; ----------------------<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;13/2y = 13/2 <br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;y = 1&nbsp; &nbsp; &nbsp; &nbsp; (equ 4)<br />
+&nbsp; &nbsp; so.<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; x - 3/2y = 1/2&nbsp; &nbsp; &nbsp; (equ 3)<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;y = 1&nbsp; &nbsp; &nbsp; &nbsp; (equ 4)<br />
+</div>
+
+<p>Using back substitution in equ 1, x = 2. Look at the coefficients of x and y. They both have coefficients of 1
+arranged diagonally. ie..</p>
+
+<div class="code">
+1x + y = c<br />
+&nbsp; &nbsp; 1y = c<br />
+</div>
+
+<p>This is called the TRIANGULAR or LOW ECHELON form of the system. Be sure to remember this as we well be encountering
+this a lot of times. And now, what you've been waiting for!!!!</p>
+
+<p>Solving the system the Matrix way!!!</p>
+
+<p><b>Rules:</b></p>
+
+<ol type="a">
+<li>Any two rows may be interchanged. This is useful if one of the equations' x-term has a coefficient of 1.</li>
+<li>The Elements of any row may be multiplied by any non-zero real number.</li>
+<li>Any row may be changed b adding to its elements a multiple of the elements of another row.</li>
+</ol>
+
+<div class="code">
+2x - 3y = 1&nbsp; &nbsp; (equ 1)<br />
+3x + 2y = 8&nbsp; &nbsp; (equ 2)<br />
+</div>
+
+<ol>
+
+<li><p>We first write the system in rows and columns. This is called the AUGMENTED matrix. Be sure that each equation is in
+standard form (ax + by = c). </p>
+
+<p><i>* This is parallel to the Echelon method above so be sure to check from time to time.</i></p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">2</td><td class="border" align="center" width="33%">-3</td><td class="border" align="center" width="33%">1</td></tr>
+<tr><td class="border" align="center">3</td><td class="border" align="center">2</td><td class="border" align="center">8</td></tr>
+</table>
+
+<p><i>*Note we only used the numeric coefficients.</i></p>
+<p><i>*2, -3, 1 , 3, 2 and 8 are called the ELEMENTS of the matrix and 2 is located at row1,col1; 8 at row2, col3; and so on...</i></p>
+</li>
+
+<li><p>To get 1 in row1, col1 we multiply the first row by 1/2.</p>
+ 
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">1</td><td class="border" align="center" width="33%">-3/2</td><td class="border" align="center" width="33%">1/2</td></tr>
+<tr><td class="border" align="center">3</td><td class="border" align="center">2</td><td class="border" align="center">8</td></tr>
+</table>
+</li>
+
+<li><p>Add (-3) times the elements of row1 to row2.</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">1</td><td class="border" align="center" width="33%">-3/2</td><td class="border" align="center" width="33%">1/2</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">13/2</td><td class="border" align="center">13/2</td></tr>
+</table>
+</li>
+
+<li><p>To get 1 in row 2, col 2; multiply row 2 by the reciprocal of 13/2 which is 2/13.</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">1</td><td class="border" align="center" width="33%">-3/2</td><td class="border" align="center" width="33%">1/2</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">1</td></tr>
+</table>
+</li>
+
+</ol>
+
+<p>So...</p>
+
+<div class="code">
+x - 3/2y = 1/2<br />
+&nbsp; &nbsp; &nbsp; &nbsp;y = 1<br />
+</div>
+
+<p>See, triangular form!!! Use back substitution to get x.</p>
+
+<p>I'll test your skills with a 3-equation system:</p>
+
+<div class="code">
+&nbsp; x +&nbsp; y -&nbsp; z =&nbsp; 6<br />
+&nbsp;2x -&nbsp; y +&nbsp; z = -9<br />
+&nbsp; x - 2y + 3z =&nbsp; 1<br />
+</div>
+
+<p>We don't need to change the element i r1,c1 since it's already 1. BTW, you can interchange any rows as you like if
+it makes the solution easier (Rule A).</p>
+
+<p>Augmented matrix:</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">-1</td><td class="border" align="center" width="25%">6</td></tr>
+<tr><td class="border" align="center">2</td><td class="border" align="center">-1</td><td class="border" align="center">1</td><td class="border" align="center">-9</td></tr>
+<tr><td class="border" align="center">1</td><td class="border" align="center">-2</td><td class="border" align="center">3</td><td class="border" align="center">1</td></tr>
+</table>
+
+<ol>
+
+<li><p>Eliminate the first element in row 2 by adding (-2) x row 1 to row 2.</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">-1</td><td class="border" align="center" width="25%">6</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">-3</td><td class="border" align="center">3</td><td class="border" align="center">-21</td></tr>
+<tr><td class="border" align="center">1</td><td class="border" align="center">-2</td><td class="border" align="center">3</td><td class="border" align="center">1</td></tr>
+</table>
+</li>
+
+<li><p>Eliminate the first element in row 3 by adding (-1) x row 1 to row 3.</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">-1</td><td class="border" align="center" width="25%">6</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">-3</td><td class="border" align="center">3</td><td class="border" align="center">-21</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">-3</td><td class="border" align="center">4</td><td class="border" align="center">-5</td></tr>
+</table>
+</li>
+
+<li><p>To get 1 in row2,col2; Multiply row 2 by -1/3.</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">-1</td><td class="border" align="center" width="25%">6</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">-1</td><td class="border" align="center">7</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">-3</td><td class="border" align="center">4</td><td class="border" align="center">7</td></tr>
+</table>
+</li>
+
+<li><p>Eliminate the second element in row 3 by adding (3) x row 2 to row 3.</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">-1</td><td class="border" align="center" width="25%">6</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">-1</td><td class="border" align="center">7</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">16</td></tr>
+</table>
+</li>
+
+</ol>
+
+<p>Translating this matrix to equation form:</p>
+
+<div class="code">
+x + y - z = 6<br />
+&nbsp; &nbsp; y - z = 7<br />
+&nbsp; &nbsp; &nbsp; &nbsp; z = 16<br />
+</div>
+
+<p>(This is the triangular form of the equations)</p>
+
+<p><i>*The method I discussed above is called the "GAUSSIAN REDUCTION". If you don't know who Karl F. Gauss is then this
+article is not for you. :*)  j/k</i></p>
+
+<h2>Properties of Matrices</h2>
+
+<p>It is customary to name Matrices with capital letters. The following is Matrix A.</p>
+
+<table>
+<tr><td>A = </td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">a<sub>11</sub></td><td class="border" align="center" width="25%">a<sub>12</sub></td><td class="border" align="center" width="25%">a<sub>13</sub></td><td class="border" align="center" width="35%">a<sub>14</sub></td></tr>
+<tr><td class="border" align="center">a<sub>21</sub></td><td class="border" align="center">a<sub>22</sub></td><td class="border" align="center">a<sub>23</sub></td><td class="border" align="center">a<sub>24</sub></td></tr>
+<tr><td class="border" align="center">a<sub>31</sub></td><td class="border" align="center">a<sub>32</sub></td><td class="border" align="center">a<sub>33</sub></td><td class="border" align="center">a<sub>34</sub></td></tr>
+<tr><td class="border" align="center">a<sub>41</sub></td><td class="border" align="center">a<sub>42</sub></td><td class="border" align="center">a<sub>43</sub></td><td class="border" align="center">a<sub>44</sub></td></tr>
+</table>
+</td></tr>
+</table>
+
+<p>With this notation, the first row and first column is a<sub>11</sub> (read: "a sub one-one").</p>
+
+<p>Matrices are classified according to size(by the number of rows and columns they contain). For example matrix A is a
+4 x 4 Matrix. On the other hand our matrix solution above is a 2 x 3 matrix:</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">1</td><td class="border" align="center" width="33%">-3/2</td><td class="border" align="center" width="33%">1/2</td></tr>
+<tr><td class="border" align="center" width="33%">0</td><td class="border" align="center" width="33%">1</td><td class="border" align="center" width="33%">1</td></tr>
+</table>
+
+<p>Certain matrices have special names like a SQUARE matrix as in 3 x 3, 2 x 2, Basically the same number of row and
+columns. A ROW matrix on the other hand is just a matrix of one row. Guess what a COLUMN matrix is? :*)</p>
+
+<h2>Operations on Matrices</h2>
+
+<ol type="a">
+
+<h3><li>Addition of matrices</h3>
+<p>To add two matrices together, add their corresponding elements. ONLY MATRICES OF THE SAME SIZE CAN BE ADDED. Same goes
+for subtraction.</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">5</td><td class="border" align="center" width="50%">-6</td></tr>
+<tr><td class="border" align="center">8</td><td class="border" align="center">9</td></tr>
+</table>
+
+<p>+</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">-4</td><td class="border" align="center" width="50%">6</td></tr>
+<tr><td class="border" align="center">8</td><td class="border" align="center">-3</td></tr>
+</table>
+
+<p>=</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">5+(-4)</td><td class="border" align="center" width="50%">-6+6</td></tr>
+<tr><td class="border" align="center">8+8</td><td class="border" align="center">9+(-3)</td></tr>
+</table>
+
+<p>=</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">1</td><td class="border" align="center" width="50%">0</td></tr>
+<tr><td class="border" align="center">16</td><td class="border" align="center">-6</td></tr>
+</table>
+<br /><br />
+
+</li>
+<h3><li>Multiplication of a Matrix by a Scalar Value</h3>
+
+<p>To multiply a scalar value by a matrix, you just multiply all elements of the matrix by the scalar value.</p>
+
+<table>
+<tr><td>5 *</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">2</td><td class="border" align="center" width="50%">-3</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">4</td></tr>
+</table>
+</td><td>&nbsp; = &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">10</td><td class="border" align="center" width="50%">-15</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">20</td></tr>
+</table>
+</td></tr>
+</table>
+<br /><br />
+
+</li>
+<h3><li>Multiplication of Matrices</h3>
+
+<p><i>RULE: You can only multiply matrices if A has the same number of columns as B. ROW by COLUMN.
+Ohh this is gonna be *messy*. :*)</i></p>
+
+<p>Given:</p>
+
+<table>
+<tr><td>A =</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">-3</td><td class="border" align="center" width="33%">4</td><td class="border" align="center" width="33%">2</td></tr>
+<tr><td class="border" align="center">5</td><td class="border" align="center">0</td><td class="border" align="center">4</td></tr>
+</table>
+</td></tr>
+</table>
+
+<br />
+
+<table>
+<tr><td>B =</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">6</td><td class="border" align="center" width="50%">4</td></tr>
+<tr><td class="border" align="center">2</td><td class="border" align="center">3</td></tr>
+<tr><td class="border" align="center">3</td><td class="border" align="center">-2</td></tr>
+</table>
+</td></tr>
+</table>
+<br />
+
+<ol>
+<li><p><i>Locate row1 of A and col1 of B, then multiply corresponding elements and add the products.</i></p>
+
+<p><i>Row 1 of A</i></p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">-3</td><td class="border" align="center" width="33%">4</td><td class="border" align="center" width="33%">2</td></tr>
+</table>
+
+<p>*</p>
+<p><i>Column 1 of B</i></p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">6</td><td class="border" align="center" width="33%">2</td><td class="border" align="center" width="33%">3</td></tr>
+</table>
+
+<p>=</p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(-3)(-6)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(4)(2)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(2)(3)</td></tr>
+</table>
+</td>
+<td>&nbsp; = &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">32</td></tr>
+</table>
+</td></tr>
+</table>
+<br />
+
+</li>
+<li><p><i>Next Row1 of A by Col2 of B</i></p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(-3)(4)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(4)(3)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(2)(-2)</td></tr>
+</table>
+</td>
+<td>&nbsp; = &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">-4</td></tr>
+</table>
+</td></tr>
+</table>
+<br />
+
+</li>
+<li><p><i>Row 2 of A and Col 1 of B</i></p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(5)(-6)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(0)(2)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(4)(3)</td></tr>
+</table>
+</td>
+<td>&nbsp; = &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">-18</td></tr>
+</table>
+</td></tr>
+</table>
+<br />
+
+</li>
+<li><p><i>Lastly, Row 2 of a and col 2 of B</i></p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(5)(4)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(0)(3)</td></tr>
+</table>
+</td>
+<td>&nbsp; + &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">(4)(-2)</td></tr>
+</table>
+</td>
+<td>&nbsp; = &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">12</td></tr>
+</table>
+</td></tr>
+</table>
+<br />
+
+</li>
+</ol>
+
+<p>The product matrix:</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="200">
+<tr><td class="border" align="center" width="50%">32</td><td class="border" align="center" width="50%">-4</td></tr>
+<tr><td class="border" align="center">-18</td><td class="border" align="center">12</td></tr>
+</table>
+
+<p>In general...</p>
+
+<b>C</b><sub>ij</sub> = <b>A</b><sub>i1</sub> * <b>B</b><sub>1j</sub> + <b>A</b><sub>i2</sub> * <b>B</b><sub>2j</sub> ...
+
+<p>For Square matrices, there are two ways to multiply as they have the same number of rows and columns.
+<i>Warning: Multiplication of matrices is not commutative.</i></p>
+
+<p>So in two 4*4 matrices, the resulting matrix is calculated as...</p>
+
+<div class="code">
+SUB Matrix.MulMatrix (M!(), TM!())<br />
+<br />
+&nbsp; &nbsp; 'Combines 2 matrices M!() and TM!()<br />
+&nbsp; &nbsp; 'ie. Result = TM x M<br />
+&nbsp; &nbsp; 'Warning matrix multiplication is not commutative.<br />
+&nbsp; &nbsp; 'M x TM &lt;&gt; TM x M<br />
+<br />
+<br />
+&nbsp; &nbsp; DIM Result!(1 TO 4, 1 TO 4) 'resultant matrix to be copied to M!()<br />
+<br />
+&nbsp; &nbsp; FOR i = 1 TO 4 <br />
+&nbsp; &nbsp; &nbsp; &nbsp; FOR j = 1 TO 4<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Result!(i, j) = 0<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FOR k = 1 TO 4<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Result!(i, j) = Result!(i, j) + TM!(i, k) * M!(k, j)<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; NEXT k<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; NEXT j<br />
+&nbsp; &nbsp; NEXT i<br />
+<br />
+END SUB<br />
+</div>
+
+</li>
+</ol>
+
+
+<p>Now that we know how to do stuff with matrices, we will now learn its applications is 3d graphics!!!! Woot!!!</p>
+
+<p>In 3d graphics its often easier to make the <b>origin(0,0,0)</b> as your viewpoint. ie. Where the lens of your camera
+is (The LEFT-HANDED system lends itself well with this if you want to make a doom-like engine). Instead of making the camera
+move around your world, you can make your world move around the camera. Relativity at its best!!!</p>
+
+<h2>Your first coordinate</h2>
+
+<p>Unless you want to do shearing and some other special effects, it's convenient to represent your 3d point/vector as
+[x y z]. I like to make this vector as a column matrix (see column matrix above). Modifying the points position is space
+requires another matrix. For simplicity, I'll make the the transfomation matrix a ROW matrix, [A B C]. To transform a
+point, you just multiply the our [x,y,z] vector with the with our ROW matrix. Remember our matrix multiplication property?
+COLUMN x ROW.</p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">x</td></tr>
+<tr><td class="border" align="center">y</td></tr>
+<tr><td class="border" align="center">z</td></tr>
+</table>
+</td>
+<td>&nbsp; * &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">A</td><td class="border" align="center" width="33%">B</td><td class="border" align="center" width="33%">C</td></tr>
+</table>
+</td></tr>
+</table>
+<br />
+
+<div class="code">
+= x*A + y*B + z*C<br />
+</div>
+
+<p><i>Now if a = 1, b=0, c=0</i></p>
+<div class="code">
+x*1 + y*0 + z*0 = x<br />
+</div>
+
+<p><i>If a = 0, b=1, c=0</i></p>
+<div class="code">
+x*0 + y*1 + z*0 = y<br />
+</div>
+
+<p><i>If a = 0, b=0, c=1</i></p>
+<div class="code">
+x*0 + y*0 + z*1 = z<br />
+</div>
+
+<p>In matrix form:</p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">1</td><td class="border" align="center" width="33%">0</td><td class="border" align="center" width="33%">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td></tr>
+</table>
+</td><td>
+<table cellspacing="2" cellpadding="4">
+<tr><td>--->x row vector A</td></tr>
+<tr><td>--->y row vector B</td></tr> 
+<tr><td>--->z row vector C</td></tr>
+</table>
+</td></tr>
+</table>
+
+<p><i>*Notice how it looks like the "Triangular" form of the matrix. :*)</i></p>
+
+<p>So to transform and entire 3d point by the vector matrix using the matrix notation above, you just multiply the point
+vector by the matrix.</p>
+
+<p><i>*x',y',z' are the new points.</i></p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">x</td></tr>
+<tr><td class="border" align="center">y</td></tr>
+<tr><td class="border" align="center">z</td></tr>
+</table>
+</td>
+<td>&nbsp; * &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="300">
+<tr><td class="border" align="center" width="33%">m<sub>11</sub></td><td class="border" align="center" width="33%">m<sub>12</sub></td><td class="border" align="center" width="33%">m<sub>13</sub></td></tr>
+<tr><td class="border" align="center">m<sub>21</sub></td><td class="border" align="center">m<sub>22</sub></td><td class="border" align="center">m<sub>23</sub></td></tr>
+<tr><td class="border" align="center">m<sub>31</sub></td><td class="border" align="center">m<sub>32</sub></td><td class="border" align="center">m<sub>33</sub></td></tr>
+</table>
+</td>
+<td>&nbsp; = &nbsp;</td>
+<td>
+<table class="border" cellspacing="0" cellpadding="4" width="100">
+<tr><td class="border" align="center">x'</td></tr>
+<tr><td class="border" align="center">y'</td></tr>
+<tr><td class="border" align="center">z'</td></tr>
+</table>
+</td></tr>
+</table>
+
+<p>=</p>
+
+<div class="code">
+x' = x*m11 + y*m12 + z*m13<br />
+y' = x*m21 + y*m22 + z*m23<br />
+z' = x*m31 + y*m32 + z*m33<br />
+</div>
+
+<p>Now as we will be using a 4x4 matrix, let me introduce you to the matrices we'll be using.</p>
+
+<ol>
+<h3><li>The IDENTITY matrix</h3>
+
+<p>Our initial "do-nothing" matrix. This means that it will produce exactly the same values as was before the transform.
+We always begin with this matrix.</p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%"><b>1</b></td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center"><b>1</b></td><td class="border" align="center">0</td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center"><b>1</b></td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center"><b>1</b></td></tr>
+</table>
+</td><td>
+<table cellspacing="2" cellpadding="4">
+<tr><td>---> x'= x</td></tr>
+<tr><td>---> y'= y</td></tr>   
+<tr><td>---> z'= z</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+
+<p>Unless you'd want to do some nasty FX like shearing, etc., the last row is always 0 0 0 1.</p>
+
+</li>
+<h3><li>The Scaling matrix</h3>
+
+<p>Scales the matrix by sx, sy and sz.</p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%"><b>sx</b></td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center"><b>sy</b></td><td class="border" align="center">0</td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center"><b>sz</b></td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td></tr>
+</table>
+</td><td>
+<table cellspacing="2" cellpadding="4">
+<tr><td>---> x'= x * sx</td></tr>
+<tr><td>---> y'= y * sy</td></tr>   
+<tr><td>---> z'= z * sz</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+
+</li>
+<h3><li>The Translation matrix.</h3>
+
+<p>Translation means just to "move" the point by Tx, Ty, Tz.</p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%"><b>Tx</b></td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">0</td><td class="border" align="center"><b>Ty</b></td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center"><b>Tz</b></td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td></tr>
+</table>
+</td><td>
+<table cellspacing="2" cellpadding="4">
+<tr><td>---> x'= x + Tx</td></tr>
+<tr><td>---> y'= y + Ty</td></tr>   
+<tr><td>---> z'= z + Tz</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+
+</li>
+<h3><li>The X-axis rotation matrix</h3>
+
+<p>Rotates the points in the x-axis by angle.</p>
+
+<p>ca = COS(angle)<br />
+sa = SIN(angle)</p>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%">1</td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center"><b>ca</b></td><td class="border" align="center"><b>-sa</b></td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center"><b>sa</b></td><td class="border" align="center"><b>ca</b></td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td></tr>
+</table>
+</td><td>
+<table cellspacing="2" cellpadding="4">
+<tr><td>---> x'= x</td></tr>
+<tr><td>---> y'= ca * y - s*z</td></tr>   
+<tr><td>---> z'= sa * y + ca * z</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+
+</li>
+<h3><li>The Y-axis rotation matrix</h3>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%"><b>ca</b></td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%"><b>sa</b></td><td class="border" align="center" width="25%">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">0</td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center"><b>-sa</b></td><td class="border" align="center">0</td><td class="border" align="center"><b>ca</b></td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td></tr>
+</table>
+</td><td>
+<table cellspacing="2" cellpadding="4">
+<tr><td>---> x'= ca * x + sa * z</td></tr>
+<tr><td>---> y'= y</td></tr>   
+<tr><td>---> z'= -sa * x + ca * z</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+ 
+</li>
+<h3><li>The Z-axis rotation matrix</h3>
+
+<table>
+<tr><td>
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%"><b>ca</b></td><td class="border" align="center" width="25%"><b>-sa</b></td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td></tr>
+<tr><td class="border" align="center"><b>sa</b></td><td class="border" align="center"><b>ca</b></td><td class="border" align="center">0</td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center">1</td></tr>
+</table>
+</td><td>
+<table cellspacing="2" cellpadding="4">
+<tr><td>---> x'= ca * x - sa * y</td></tr>
+<tr><td>---> y'= sa * x + ca * y</td></tr>   
+<tr><td>---> z'= z</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>
+
+</li>
+</ol>
+
+<p>Note that the axis of rotation is NOT being transformed in the 3 rotational matrices.  Now with all the abstract math
+out of the way, the fun part....</p>
+
+<h2>Applications</h2>
+
+<p>To make a 3d object rotate around space using matrices, you just combine all the transformation matrices into one final
+parent matrix and use that matrix to transform your points. Here's the pseudo code:</p>
+
+<div class="code">
+Matrix!() is our final combined matrix<br />
+Tmatrix!() is a temporary matrix used for transformation.<br />
+Dim Matrix!(1 to 4, 1 to 4)<br />
+Dim TMatrix!(1 to 4, 1 to 4)<br />
+<br />
+&nbsp; &nbsp; 1.&nbsp; &nbsp; &nbsp;Set Matrix! and Tmatrix as Identity matrices.<br />
+&nbsp; &nbsp; 2.&nbsp; &nbsp; &nbsp;Set Tmatrix! as Scaling matrix<br />
+&nbsp; &nbsp; 3.&nbsp; &nbsp; &nbsp;Multiply Matrix! and Tmatrix!<br />
+&nbsp; &nbsp; 4.&nbsp; &nbsp; &nbsp;Set Tmatrix! as Translate matrix<br />
+&nbsp; &nbsp; 5.&nbsp; &nbsp; &nbsp;Multiply Matrix! and Tmatrix!<br />
+&nbsp; &nbsp; 6.&nbsp; &nbsp; &nbsp;Set Tmatrix! as RotX matrix<br />
+&nbsp; &nbsp; 7.&nbsp; &nbsp; &nbsp;Multiply Matrix! and Tmatrix!<br />
+&nbsp; &nbsp; 8.&nbsp; &nbsp; &nbsp;[6] but RotY then [7]<br />
+&nbsp; &nbsp; 9.&nbsp; &nbsp; &nbsp;[6] but ROTZ then [7]<br />
+&nbsp; &nbsp; 10.&nbsp; &nbsp; For i =0 to numpoints<br />
+&nbsp; &nbsp; 11.&nbsp; &nbsp; &nbsp; &nbsp; TransformPoints using Matrix<br />
+&nbsp; &nbsp; 12.&nbsp; &nbsp; &nbsp; &nbsp; Project points<br />
+&nbsp; &nbsp; 13.&nbsp; &nbsp; next i<br />
+</div>
+
+<p><i>*Codes 2 to 9 can be interchanged in any way you want. If you have normals you'd like to rotate, you can use the same
+transformation matrix to rotate them. I urge you to experiment and play with the order of operations so that you may see
+how it changes the entire transformation.</i></p>
+
+<p>Here's the working QB code for you to enjoy:<br />
+<a href="matrix.bas" target="_blank">matrix.bas</a></p>
+
+<p>As an excersise, why don't you make a gouraud filled polygon using matrices to rotate your model and normals? Be sure to
+rotate with the same matrix.</p>
+
+<p>You might say, "But your rotation tutorial has some very fast ready-made matrix constants. It's also fairly faster as we
+don't have to multiply matrices." Yes those constants are faster than the matrix method but they are limited. Here are some
+limitations:</p>
+
+<ol>
+<li>Those constants have a fixed order of rotation (x,y and then z). If you want to change the order of rotation, you need
+to do the "messy" factoring I did again. With matrices all you have to do is change the order and that's it. Simple as
+it can get.</li>
+
+<li>To translate points from the camera, you have to subtract your camera vector from your transformed points manually. The
+matrix way would just use the translation matrix.</li>
+
+<li>To translate from the origin, you'd have to subtract a translation vector manually from the original non-rotated points
+while with matrices, you just translate before rotate. :*)</li>
+
+<li>Those constants are limited to angular viewing systems while matrices can handle any viewing system. Most popular of
+them is the LOOKAT transform (I'll get to that in the next article).</li>
+
+<li>The speed difference is not apparent considering all the calculations in both methods are *outside* your rasterizing
+loop. I never lost a single frame myself. The more the points to transform, the less difference it makes.</li>
+</ol>
+
+<p>Some of you may have already seen matrices defined like this:</p>
+
+<p>Translation matrix:</p>
+
+<table class="border" cellspacing="0" cellpadding="4" width="400">
+<tr><td class="border" align="center" width="25%"><b>1</b></td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td><td class="border" align="center" width="25%">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center"><b>1</b></td><td class="border" align="center">0</td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">0</td><td class="border" align="center">0</td><td class="border" align="center"><b>1</b></td><td class="border" align="center">0</td></tr>
+<tr><td class="border" align="center">Tx</td><td class="border" align="center">Ty</td><td class="border" align="center">Tz</td><td class="border" align="center"><b>1</b></td></tr>
+</table>
+
+<p>This is the DirectX and OpenGL system of matrices where rows are swapped with the columns. So be sure to use this
+system if you're coding via DX or OGL. I'm using the "standard" math notation in this article.</p>
+
+<p>Credits:</p>
+
+<p>Mark Feldman for his matrix doc. <i>(I was having problems with the rotation matrices until I read your doc. Thanks!!!)</i><br />
+Plasma for SetVideoSeg<br />
+wildcard for this "series" idea.<br />
+Hugo Elias for his WuPixel doc.<br />
+Toshi for his kind comments.<br />
+3D ica for their excellent doc.<br />
+And you the reader of this doc.<br />
+Biskbart for the torus. <br />
+Happy Coding!!!!<br />
+</p>
+
+<p><b>Richard Eric M. Lope (Relsoft)</b><br />
+<a href="http://rel.betterwebber.com/" target="_blank">http://rel.betterwebber.com/</a><br />
+<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;</a></p>
+
+<p>*For questions and suggestions, I hang out at the
+<a href="http://www.qbasicnews.com/" target="_blank">qbasicnews.com</a> forum at
+<a href="http://forum.qbasicnews.com/" target="_blank">http://forum.qbasicnews.com</a>.</p>
+<div class="divide"></div>
+<table>
+<tr><td align="right"><b>Author:</b></td><td>Rel (Richard Eric M. Lope)</td></tr>
+<tr><td align="right"><b>Email:</b></td><td><a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;">&#118;&#105;&#99;&#95;&#118;&#105;&#112;&#101;&#114;&#112;&#104;&#64;&#121;&#97;&#104;&#111;&#111;&#46;&#99;&#111;&#109;</a></a></td></tr>
+<tr><td align="right"><b>Website:</b></td><td><a href="http://rel.betterwebber.com/" target="_blank">http://rel.betterwebber.com/</a></td></tr>
+<tr><td align="right"><b>Released:</b></td><td>2004</td></tr>
+</table>
+</body>
+</html>
